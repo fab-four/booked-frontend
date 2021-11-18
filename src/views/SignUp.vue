@@ -70,6 +70,7 @@
               :rules="[comparePasswords]"
             />
             <v-radio-group
+              v-model="sex"
               row
               :rules="[v => !!v || 'Item is required']"
             >
@@ -139,6 +140,7 @@ export default {
       email: '',
       password: '',
       confirmPassword: '',
+      sex: '',
       rules: {
         required: value => !!value || 'Required',
         email: value => {
@@ -146,10 +148,11 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.';
         },
       },
+      loading: false,
     };
   },
   computed: {
-    ...mapGetters(['error', 'loading']),
+    ...mapGetters(['error']),
     comparePasswords() {
       return this.password !== this.confirmPassword
         ? 'Passwords do not match'
@@ -160,19 +163,30 @@ export default {
     this.clearError();
   },
   methods: {
-    ...mapActions(['userSignUp', 'clearError']),
+    ...mapActions(['clearError']),
     onSubmit() {
       // console.log('submitted');
       this.userSignUp({
         email: this.email,
         password: this.password,
-        firstName: this.firstName,
-        lastName: this.lastName,
+        personalDetails: {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          sex: this.sex,
+        },
       });
     },
     onDismissed() {
       // console.log('Dismissed alert');
       this.clearError();
+    },
+    userSignUp(credentials) {
+      this.loading = true;
+      const path = '/auth/signUp';
+      this.$store.dispatch('authenticate', {path, credentials}).then((response) => {
+        console.log(response);
+        this.loading = false;
+      });
     },
   },
 };

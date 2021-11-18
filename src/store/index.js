@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import { api } from '@/utils/services';
 // import firebase from 'firebase/app';
 // import 'firebase/auth';
 // import 'firebase/database';
@@ -42,6 +43,15 @@ export default new Vuex.Store({
     // setItem(state, payload) {
     // 	state.item = payload;
     // }
+    setUserData(state, data) {
+      let flag = false;
+      if (flag) {
+        state.token = data.token;
+        state.user = Object.assign({}, state.user, data.user);
+        localStorage.setItem('token', data.token);
+        axios.defaults.headers['Authorization'] = data.token;     
+      }
+    },
   },
 
   actions: {
@@ -139,7 +149,15 @@ export default new Vuex.Store({
       //     commit('setLoading', false);
       //   });
     },
-
+    authenticate({ commit }, {path, credentials}) {
+      return api(path, credentials)
+        .then((response) => {
+          if (response.success) {
+            commit('setUserData', response);
+          }
+          return response;
+        });
+    },
     // async fetchFavorites({ state, commit }) {
     //   while (state.loading) await new Promise(r => setTimeout(r, 50));
     //   commit('setLoading', true);

@@ -80,7 +80,6 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-
 export default {
   name: 'SignIn',
   data() {
@@ -95,23 +94,32 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.';
         },
       },
+      loading: false,
     };
   },
-  computed: mapGetters(['error', 'loading']),
+  computed: mapGetters(['error']),
   created() {
     this.clearError();
   },
   methods: {
     ...mapActions(['clearError']),
-    // onSubmit() {
-    //   this.userSignIn({
-    //     email: this.email,
-    //     password: this.password,
-    //   });
-    // },
+    onSubmit() {
+      this.userSignIn({
+        email: this.email,
+        password: this.password,
+      });
+    },
     onDismissed() {
       // console.log('Dismissed alert');
       this.clearError();
+    },
+    userSignIn(credentials) {
+      this.loading = true;
+      const path = '/auth/signIn';
+      this.$store.dispatch('authenticate', {path, credentials}).then((response) => {
+        console.log(response);
+        this.loading = false;
+      });
     },
   },
 };
