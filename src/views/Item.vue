@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-v-html -->
   <v-container
     fluid
     class="px-0 py-0"

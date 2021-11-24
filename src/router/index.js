@@ -4,7 +4,7 @@ import Home from '../views/Home';
 // import Item from "../views/Item";
 import SignIn from '../views/SignIn';
 import SignUp from '../views/SignUp';
-// import Profile from '../views/Profile';
+import Profile from '../views/Profile';
 // import Favorites from '../views/Favorites';
 // import AuthGaurd from './auth_guard';
 // import firebase from 'firebase/app';
@@ -41,15 +41,15 @@ const routes = [
     },
     // component: () => import('../views/SignUp.vue')
   },
-  // {
-  //   path: '/profile',
-  //   name: 'Profile',
-  //   component: Profile,
-  //   // beforeEnter: AuthGaurd
-  //   meta: {
-  //     requiresAuth: true,
-  //   },
-  // },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    // beforeEnter: AuthGaurd
+    meta: {
+      requiresAuth: true,
+    },
+  },
   // {
   //   path: '/favorites',
   //   name: 'Favorites',

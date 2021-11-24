@@ -14,7 +14,8 @@ export default new Vuex.Store({
   state: {
     collection: [],
     totalItems: 0,
-    // user: null,
+    token: null,
+    user: null,
     error: null,
     loading: false,
     query: '',
@@ -30,9 +31,6 @@ export default new Vuex.Store({
     setTotalItems(state, payload) {
       state.totalItems = payload;
     },
-    // setUser(state, payload) {
-    //   state.user = payload;
-    // },
     setError(state, payload) {
       state.error = payload;
     },
@@ -52,13 +50,11 @@ export default new Vuex.Store({
     // 	state.item = payload;
     // }
     setUserData(state, data) {
-      let flag = false;
-      if (flag) {
+      if (data.token) {
         state.token = data.token;
-        state.user = Object.assign({}, state.user, data.user);
         localStorage.setItem('token', data.token);
-        axios.defaults.headers['Authorization'] = data.token;     
       }
+      state.user = Object.assign({}, state.user, data.user);
     },
   },
 
@@ -72,57 +68,6 @@ export default new Vuex.Store({
       commit('setIndex', index);
       commit('setLoading', true);
       commit('setError', null);
-      // let api_url = process.env.VUE_APP_API_URL;
-      // let api_key = process.env.VUE_APP_API_KEY;
-      // console.log('start fetch');
-      // let collection = {};
-      // let promiseList = [];
-
-      // fetch trending movies and tv shows of the week
-      // let url, params;
-      // if (query === '') {
-      //   url = 'https://openlibrary.org/subjects/new_york_times_bestseller.json';
-      //   axios.get(url).then(response => {
-      //     if (response.status === 200) {
-      //       console.log(response.data);
-      //       commit('setCollection', response.data.works.filter(obj => obj.cover_id));
-      //     }
-      //     else {
-      //       console.log('Request failed');
-      //     }
-      //     commit('setLoading', false);
-      //   })
-      //     .catch(error => {
-      //     // console.log('Some error occurred');
-      //       commit('setError', error);
-      //       commit('setLoading', false);
-      //     });
-      // }
-      // else {
-      //   console.log(query);
-      //   url = 'https://openlibrary.org/search.json';
-      //   params = {
-      //     q: query,
-      //     limit: 100,
-      //   };
-      //   axios.get(url, { params })
-      //     .then(response => {
-      //       console.log(response.config.url);
-      //       if (response.status === 200) {
-      //         console.log(response.data);
-      //         commit('setCollection', response.data.docs.filter(obj => obj.ebook_count_i));
-      //       }
-      //       else {
-      //         console.log('Request failed');
-      //       }
-      //       commit('setLoading', false);
-      //     })
-      //     .catch(error => {
-      //       // console.log('Some error occurred');
-      //       commit('setError', error);
-      //       commit('setLoading', false);
-      //     });
-      // }
       if (query === '')
         query = 'harry potter';
       let url = 'https://www.googleapis.com/books/v1/volumes';
@@ -147,50 +92,22 @@ export default new Vuex.Store({
           commit('setError', error);
           commit('setLoading', false);
         });
-      // for (let type of ['tv', 'movie']) {
-      //   collection[type] = [];
-      //   // let url = api_url,
-      //   let params = {};
-      //   params['api_key'] = api_key;
-      //   if (query) {
-      //     url += 'search/' + type;
-      //     params['type'] = type;
-      //     params['query'] = query;
-      //   } else {
-      //     url += `trending/${type}/week`;
-      //   }
-
-      //   promiseList.push(
-      //     axios.get(url, { params }).then(response => {
-      //       // console.log(response);
-      //       if (response.status == 200) {
-      //         collection[type] = response.data.results;
-      //         collection[type].map(obj => (obj['type'] = type));
-      //         commit('setCollection', collection);
-      //       } else {
-      //         // console.log('failed');
-      //       }
-      //     }),
-      //   );
-      // }
-      // Promise.all(promiseList)
-      //   .then(() => {
-      //     commit('setLoading', false);
-      //   })
-      //   .catch(error => {
-      //     // console.log('Some error occurred');
-      //     commit('setError', error);
-      //     commit('setLoading', false);
-      //   });
     },
-    authenticate({ commit }, {path, credentials}) {
-      return api(path, credentials)
+    
+    authenticate({ commit }, { path, data }) {
+      commit('setLoading', true);
+      commit('setError', null);
+      api(path, data)
         .then((response) => {
           if (response.success) {
             commit('setUserData', response);
           }
-          return response;
-        });
+        })
+        .catch(error => {
+          commit('setUserData', { token: null, user: null });
+          commit('setError', error);
+        })
+        .finally(() => commit('setLoading', false));
     },
     // async fetchFavorites({ state, commit }) {
     //   while (state.loading) await new Promise(r => setTimeout(r, 50));
@@ -253,78 +170,16 @@ export default new Vuex.Store({
     //   // console.log(state.favorites);
     // },
 
-    // userSignUp({ commit, dispatch }, { email, password, firstName, lastName }) {
-    //   commit('setLoading', true);
-    //   commit('setError', null);
-    //   firebase
-    //     .auth()
-    //     .createUserWithEmailAndPassword(email, password)
-    //     .then(user => {
-    //       // console.log('User signed up');
-    //       router.go();
-    //       const userData = {
-    //         id: user.user.uid,
-    //         favorites: {},
-    //         firstName: firstName,
-    //         lastName: lastName,
-    //       };
-    //       dispatch('updateUserData', { userData: userData });
-    //       // router.push({ name: 'Home' });
-    //     })
-    //     .catch(error => {
-    //       commit('setUser', null);
-    //       commit('setError', error);
-    //       commit('setLoading', false);
-    //     });
-    // },
-
-    // userSignIn({ commit, dispatch }, { email, password }) {
-    //   commit('setLoading', true);
-    //   commit('setError', null);
-    //   firebase
-    //     .auth()
-    //     .signInWithEmailAndPassword(email, password)
-    //     .then(user => {
-    //       // console.log('User signed in');
-    //       router.go();
-    //       const userData = {
-    //         id: user.user.uid,
-    //         favorites: {},
-    //       };
-    //       commit('setUser', userData);
-    //       dispatch('getUserData');
-    //       // router.push({ name: 'Home' });
-    //     })
-    //     .catch(error => {
-    //       commit('setError', error);
-    //       commit('setLoading', false);
-    //     });
-    // },
-
     // autoSignIn({ commit, dispatch }, payload) {
     //   commit('setUser', { id: payload.uid, favorites: {} });
     //   dispatch('getUserData');
     // },
 
-    // userSignOut({ commit }) {
-    //   commit('setLoading', true);
-    //   commit('setError', null);
-    //   firebase
-    //     .auth()
-    //     .signOut()
-    //     .then(() => {
-    //       // console.log('User signed out');
-    //       commit('setUser', null);
-    //       commit('setLoading', false);
-    //       // router.push({ name: 'Home' }).catch(() => router.go());
-    //     })
-    //     .catch(error => {
-    //       commit('setError', error);
-    //       commit('setLoading', false);
-    //       // console.log(error);
-    //       // router.push({ name: 'Home' }).catch(() => router.go());
-    //     });
-    // },
+    userSignOut({ commit }) {
+      commit('setUserData', { token: null, user: null });
+      localStorage.removeItem('token');
+      location.reload();
+    },
 
     // getUserData({ commit, getters }) {
     //   commit('setLoading', true);
@@ -345,24 +200,26 @@ export default new Vuex.Store({
     //     });
     // },
 
-    // updateUserData({ commit }, { userData, message = '', loading = true }) {
-    //   commit('setLoading', loading);
-    //   commit('setError', null);
-    //   commit('setUser', userData);
-    //   // console.log(getters.user, userData);
-    //   firebase
-    //     .database()
-    //     .ref('/users/' + userData.id)
-    //     .update(userData)
-    //     .then(() => {
-    //       commit('setLoading', false);
-    //       commit('setError', { message: message });
-    //     })
-    //     .catch(error => {
-    //       commit('setLoading', false);
-    //       commit('setError', error);
-    //     });
-    // },
+    updateUserData({ commit }, { user, loading = true, message = '' }) {
+      commit('setLoading', loading);
+      commit('setError', null);
+      commit('setUserData', { user });
+      // console.log(getters.user, userData);
+      api('/auth/updateDetails', user)
+        .then((response) => {
+          if (response.success) {
+            console.log(message);
+            // commit('setError', { message: message });
+          }
+          else {
+            console.log('update failed');
+          }
+        })
+        .catch(error => {
+          commit('setError', error);
+        })
+        .finally(() => commit('setLoading', false));
+    },
 
     clearError({ commit }) {
       commit('setError', null);
@@ -374,7 +231,7 @@ export default new Vuex.Store({
 
   getters: {
     collection: state => state.collection,
-    // user: state => state.user,
+    user: state => state.user,
     error: state => state.error,
     loading: state => state.loading,
     getImage: () => item => {
@@ -391,9 +248,9 @@ export default new Vuex.Store({
       return defaultImage;
     },
     totalItems: state => state.totalItems,
-    // isAuthenticated: state => {
-    //   return state.user !== null && state.user != undefined;
-    // },
+    isAuthenticated: state => {
+      return state.user !== null && state.user != undefined;
+    },
     // favorites: state => state.favorites,
   },
   modules: {},

@@ -60,7 +60,7 @@
           </v-icon>
           {{ item.title }}
         </v-btn>
-        <!-- <v-btn
+        <v-btn
           v-if="isAuthenticated"
           text
           dark
@@ -70,10 +70,10 @@
             left
             dark
           >
-            exit_to_app
+            mdi-logout
           </v-icon>
           Sign Out
-        </v-btn> -->
+        </v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <v-main>
@@ -85,7 +85,7 @@
 
 <script>
 import NavigationMenu from '@/components/NavigationMenu';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 // import Snackbar from '@/components/Snackbar';
 
 export default {
@@ -101,33 +101,33 @@ export default {
     };
   },
   computed: {
-    // ...mapGetters(['user', 'isAuthenticated', 'loading']),
+    ...mapGetters(['user', 'isAuthenticated', 'loading']),
     ...mapGetters(['loading']),
     menuItems() {
       let menuItems = [
         { icon: 'mdi-account-plus', title: 'Sign Up', link: '/signup' },
         { icon: 'mdi-lock', title: 'Sign In', link: '/signin' },
       ];
-      // if (this.isAuthenticated) {
-      //   menuItems = [
-      //     { icon: 'person', title: 'Profile', link: '/profile' },
-      //     {
-      //       icon: 'mdi-heart-multiple',
-      //       title: 'Favorites',
-      //       link: '/favorites',
-      //     },
-      //   ];
-      // }
+      if (this.isAuthenticated) {
+        menuItems = [
+          { icon: 'mdi-account', title: 'Profile', link: '/profile' },
+          // {
+          //   icon: 'mdi-heart-multiple',
+          //   title: 'Favorites',
+          //   link: '/favorites',
+          // },
+        ];
+      }
       return menuItems;
     },
   },
-  // methods: {
-  //   ...mapActions(['userSignOut']),
+  methods: {
+    ...mapActions(['userSignOut']),
 
-  //   onSignout() {
-  //     this.userSignOut();
-  //   },
-  // },
+    onSignout() {
+      this.userSignOut();
+    },
+  },
 };
 </script>
 

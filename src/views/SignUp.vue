@@ -7,7 +7,7 @@
       v-if="error"
       justify="center"
     >
-      <v-col sm="6">
+      <v-col :cols="cols">
         <app-alert
           :text="error.message"
           :type="'error'"
@@ -17,11 +17,7 @@
     </v-row>
 
     <v-row justify="center">
-      <v-col
-        cols="10"
-        sm="6"
-        md="4"
-      >
+      <v-col :cols="cols">
         <v-card flat>
           <v-card-title class="font-weight-black text-h4 justify-center">
             Register
@@ -31,25 +27,28 @@
             @submit.prevent="onSubmit"
           >
             <v-text-field
-              v-model="firstName"
-              prepend-inner-icon="mdi-account"
-              name="firstName"
-              label="First Name"
-              :rules="[rules.required]"
-            />
-            <v-text-field
-              v-model="lastName"
-              prepend-inner-icon="mdi-account"
-              name="lastName"
-              label="Last Name"
-            />
-            <v-text-field
               id="email"
               v-model="email"
               prepend-inner-icon="mdi-email"
               name="email"
               label="Email"
               :rules="[rules.required, rules.email]"
+              outlined
+            />
+            <v-text-field
+              v-model="firstName"
+              prepend-inner-icon="mdi-account"
+              name="firstName"
+              label="First Name"
+              :rules="[rules.required]"
+              outlined
+            />
+            <v-text-field
+              v-model="lastName"
+              prepend-inner-icon="mdi-account"
+              name="lastName"
+              label="Last Name"
+              outlined
             />
             <v-text-field
               id="password"
@@ -57,8 +56,11 @@
               prepend-inner-icon="mdi-lock"
               name="password"
               label="Password"
-              type="password"
               :rules="[rules.required]"
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
             />
             <v-text-field
               id="confirmPassword"
@@ -66,8 +68,11 @@
               prepend-inner-icon="mdi-lock"
               name="confirmPassword"
               label="Confirm Password"
-              type="password"
               :rules="[comparePasswords]"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              outlined
+              :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showConfirmPassword = !showConfirmPassword"
             />
             <v-radio-group
               v-model="sex"
@@ -84,12 +89,17 @@
                 label="Female"
                 value="Female"
               />
+              <v-radio
+                on-icon="mdi-gender-non-binary"
+                label="Other"
+                value="Other"
+              />
             </v-radio-group>
-            <v-checkbox :rules="[v => !!v || 'You must agree to continue!']">
+            <!-- <v-checkbox :rules="[v => !!v || 'You must agree to continue!']">
               <template #label>
                 <div>I agree to the <a href="">Terms and Conditions</a></div>
               </template>
-            </v-checkbox>
+            </v-checkbox> -->
             <v-card-actions>
               <v-btn
                 color="primary"
@@ -145,48 +155,59 @@ export default {
         required: value => !!value || 'Required',
         email: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return pattern.test(value) || 'Invalid e-mail.';
+          return pattern.test(value) || 'Invalid e-mail';
         },
       },
-      loading: false,
+      showPassword: false,
+      showConfirmPassword: false,
     };
   },
   computed: {
-    ...mapGetters(['error']),
+    ...mapGetters(['error', 'loading']),
     comparePasswords() {
       return this.password !== this.confirmPassword
         ? 'Passwords do not match'
         : true;
+    },
+    cols() {
+      let cols = 10;
+      switch (this.$vuetify.breakpoint.name) {
+      case 'xl':
+        cols = 3;
+        break;
+      case 'lg':
+        cols = 4;
+        break;
+      case 'md':
+      case 'sm':
+        cols = 6;
+      }
+      return cols;
     },
   },
   created() {
     this.clearError();
   },
   methods: {
-    ...mapActions(['clearError']),
+    ...mapActions(['clearError', 'authenticate']),
     onSubmit() {
       // console.log('submitted');
-      this.userSignUp({
-        email: this.email,
-        password: this.password,
-        personalDetails: {
-          firstName: this.firstName,
-          lastName: this.lastName,
-          sex: this.sex,
+      this.authenticate({
+        path: '/auth/signUp', 
+        data: {
+          email: this.email,
+          password: this.password,
+          personalDetails: {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            sex: this.sex,
+          },
         },
       });
     },
     onDismissed() {
       // console.log('Dismissed alert');
       this.clearError();
-    },
-    userSignUp(credentials) {
-      this.loading = true;
-      const path = '/auth/signUp';
-      this.$store.dispatch('authenticate', {path, credentials}).then((response) => {
-        console.log(response);
-        this.loading = false;
-      });
     },
   },
 };

@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-v-html -->
   <v-card flat>
     <v-row
       v-if="item"

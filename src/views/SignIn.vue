@@ -7,7 +7,7 @@
       v-if="error"
       justify="center"
     >
-      <v-col sm="6">
+      <v-col :cols="cols">
         <app-alert
           :text="error.message"
           :type="'error'"
@@ -17,11 +17,7 @@
     </v-row>
 
     <v-row justify="center">
-      <v-col
-        cols="10"
-        sm="6"
-        md="4"
-      >
+      <v-col :cols="cols">
         <v-card flat>
           <v-card-title class="justify-center">
             <h3 class="text-center">
@@ -29,7 +25,7 @@
             </h3>
           </v-card-title>
           <v-form
-            v-model="formValid"
+            v-model="valid"
             @submit.prevent="onSubmit"
           >
             <v-text-field
@@ -39,6 +35,7 @@
               name="email"
               label="Email"
               :rules="[rules.required, rules.email]"
+              outlined
             />
             <v-text-field
               id="password"
@@ -46,8 +43,11 @@
               prepend-inner-icon="mdi-lock"
               name="password"
               label="Password"
-              type="password"
               :rules="[rules.required]"
+              :type="showPassword ? 'text' : 'password'"
+              outlined
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
             />
 
             <v-card-actions>
@@ -56,7 +56,7 @@
                 large
                 block
                 type="submit"
-                :disabled="!formValid || loading"
+                :disabled="!valid || loading"
                 :loading="loading"
               >
                 Sign In
@@ -84,7 +84,7 @@ export default {
   name: 'SignIn',
   data() {
     return {
-      formValid: false,
+      valid: false,
       email: '',
       password: '',
       rules: {
@@ -95,31 +95,44 @@ export default {
         },
       },
       loading: false,
+      showPassword: false,
     };
   },
-  computed: mapGetters(['error']),
+  computed: {
+    ...mapGetters(['error']),
+    cols() {
+      let cols = 10;
+      switch (this.$vuetify.breakpoint.name) {
+      case 'xl':
+        cols = 3;
+        break;
+      case 'lg':
+        cols = 4;
+        break;
+      case 'md':
+      case 'sm':
+        cols = 6;
+      }
+      return cols;
+    },
+  },
   created() {
     this.clearError();
   },
   methods: {
-    ...mapActions(['clearError']),
+    ...mapActions(['clearError', 'authenticate']),
     onSubmit() {
-      this.userSignIn({
-        email: this.email,
-        password: this.password,
+      this.authenticate({
+        path: '/auth/signIn', 
+        data: {
+          email: this.email,
+          password: this.password,
+        },
       });
     },
     onDismissed() {
       // console.log('Dismissed alert');
       this.clearError();
-    },
-    userSignIn(credentials) {
-      this.loading = true;
-      const path = '/auth/signIn';
-      this.$store.dispatch('authenticate', {path, credentials}).then((response) => {
-        console.log(response);
-        this.loading = false;
-      });
     },
   },
 };

@@ -39,24 +39,24 @@
       </v-list-item>
     </template>
 
-    <!-- <v-list-item
+    <v-list-item
       v-if="isAuthenticated"
       @click="onSignout"
     >
       <v-list-item-action>
         <v-icon light>
-          exit_to_app
+          mdi-logout
         </v-icon>
       </v-list-item-action>
       <v-list-item-content>
         <v-list-item-title> Sign Out </v-list-item-title>
       </v-list-item-content>
-    </v-list-item> -->
+    </v-list-item>
   </v-list>
 </template>
 
 <script>
-// import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 export default {
   props: {
     items: {
@@ -64,13 +64,13 @@ export default {
       default: () => [],
     },
   },
-  // computed: mapGetters(['user', 'isAuthenticated']),
-  // methods: {
-  //   ...mapActions(['userSignOut']),
-  //   onSignout() {
-  //     this.userSignOut();
-  //   },
-  // },
+  computed: mapGetters(['user', 'isAuthenticated']),
+  methods: {
+    ...mapActions(['userSignOut']),
+    onSignout() {
+      this.userSignOut();
+    },
+  },
 };
 </script>
 

@@ -26,9 +26,9 @@
         class="text-center"
       >
         <v-pagination
+          v-if="!loading || collection.length"
           v-model="page"
-          :length="Math.ceil(totalItems / 12)"
-          :total-visible="10"
+          :length="Math.min(Math.ceil(totalItems / 12), 10)"
           @input="updateCollection('index')"
         />
       </div>
