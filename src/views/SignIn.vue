@@ -60,7 +60,7 @@
                 :loading="loading"
               >
                 Sign In
-                <template v-slot:loader>
+                <template #loader>
                   <span class="custom-loader">
                     <v-icon light>mdi-cached</v-icon>
                   </span>

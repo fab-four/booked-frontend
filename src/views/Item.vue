@@ -4,7 +4,7 @@
     class="px-0 py-0"
   >
     <v-card
-      v-if="item && item.key"
+      v-if="item && item.id"
       flat
     >
       <v-row
@@ -13,41 +13,112 @@
       >
         <v-col
           cols="12"
+          sm="10"
           md="10"
-          lg="4"
+          lg="6"
+          xl="4"
+          :class="[{ 'sticky': ['lg', 'xl'].includes($vuetify.breakpoint.name) }]"
         >
-          <v-img
-            :src="getImage((item && item.covers) ? item.covers[0] : '')"
-            class="ma-0"
-            max-height="90vh"
-            gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
-          >
-            <template v-slot:placeholder>
-              <Loading />
-            </template>
+          <div class="d-flex flex-column align-center">
+            <v-img
+              :src="getImage(item)"
+              class="ma-0"
+              gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
+              width="400px"
+              height="600px"
+            >
+              <template #placeholder>
+                <Loading />
+              </template>
 
-            <Overlay :item="item" />
-          </v-img>
+              <Overlay
+                :item="item.volumeInfo"
+              />
+            </v-img>
+            <Ratings :item="item.volumeInfo" />
+          </div>
         </v-col>
-
         <v-col
           cols="12"
+          sm="10"
           md="10"
-          lg="8"
+          lg="6"
+          xl="8"
         >
-          <div v-if="item && item.description">
+          <div>
             <v-card-title class="font-weight-bold text-h4">
               Description
             </v-card-title>
             <v-card-text
+              v-if="item.volumeInfo.description"
               class="text-h6"
-              style="white-space: pre-line;"
+              v-html="item.volumeInfo.description"
+            />
+            <v-card-text
+              v-else
+              class="text-h6"
             >
-              {{ item.description }}
+              No description available.
             </v-card-text>
           </div>
-
-          <!-- <Ratings :item="item" /> -->
+          <div v-if="item.volumeInfo.authors && item.volumeInfo.authors.length">
+            <v-card-title class="font-weight-bold text-h4">
+              Authors
+            </v-card-title>
+            <v-card-text class="text-h6">
+              {{ item.volumeInfo.authors.join(', ') }}
+            </v-card-text>
+          </div>
+          <div v-if="item.volumeInfo.publisher">
+            <v-card-title class="font-weight-bold text-h4">
+              Publisher
+            </v-card-title>
+            <v-card-text class="text-h6">
+              {{ item.volumeInfo.publisher }}
+            </v-card-text>
+          </div>
+          <div v-if="item.volumeInfo.language">
+            <v-card-title class="font-weight-bold text-h4">
+              Language
+            </v-card-title>
+            <v-card-text class="text-h6">
+              {{ item.volumeInfo.language }}
+            </v-card-text>
+          </div>
+          <div v-if="item.volumeInfo.categories && item.volumeInfo.categories.length">
+            <v-card-title class="font-weight-bold text-h4">
+              Categories
+            </v-card-title>
+            <v-card-text class="text-h6">
+              <v-chip
+                v-for="(category, i) in item.volumeInfo.categories.slice(0, 5)"
+                :key="i"
+                class="ma-1"
+                color="primary"
+                dark
+              >
+                {{ category }}
+              </v-chip>
+            </v-card-text>
+          </div>
+          <div v-if="item.volumeInfo.pageCount">
+            <v-card-title class="font-weight-bold text-h4">
+              Pages
+            </v-card-title>
+            <v-card-text class="text-h6">
+              {{ item.volumeInfo.pageCount }}
+            </v-card-text>
+          </div>
+          <div v-if="item.volumeInfo.dimensions">
+            <v-card-title class="font-weight-bold text-h4">
+              Dimensions
+            </v-card-title>
+            <v-card-text class="text-h6">
+              {{ item.volumeInfo.dimensions.height }} x
+              {{ item.volumeInfo.dimensions.width }} x
+              {{ item.volumeInfo.dimensions.thickness }}
+            </v-card-text>
+          </div>
         </v-col>
       </v-row>
 
@@ -272,7 +343,7 @@
               >
                 <v-expansion-panel-header class="text-h5">
                   Season {{ i }}
-                  <template v-slot:actions>
+                  <template #actions>
                     <v-icon x-large>
                       $expand
                     </v-icon>
@@ -314,7 +385,7 @@
                 class="font-weight-bold text-h4 my-3 ml-n3"
               >
                 Similar
-                <template v-slot:actions>
+                <template #actions>
                   <v-icon x-large>
                     $expand
                   </v-icon>
@@ -346,7 +417,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import { getItem } from '@/utils/helpers';
 // import ItemCard from '@/components/ItemCard';
-// import Ratings from '@/components/Ratings';
+import Ratings from '@/components/Ratings';
 import Loading from '@/components/Loading';
 import Overlay from '@/components/Overlay';
 // import ProfileDialog from '@/components/ProfileDialog';
@@ -355,7 +426,7 @@ export default {
   name: 'Item',
   components: {
     // ItemCard,
-    // Ratings,
+    Ratings,
     Loading,
     Overlay,
     // ProfileDialog,
@@ -487,5 +558,14 @@ export default {
 <style scoped>
   * {
     word-break: break-word;
+  }
+  .sticky {
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    top: 64px;
+    align-self: flex-start; /* <-- this is the fix */
+  }
+  .v-image >>> .v-image__image {
+    background-size: 100% 100%;
   }
 </style>

@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 export const getItem = async (id) => {
-  return await axios.get(`https://openlibrary.org/works/${id}.json`)
+  return await axios.get(`https://www.googleapis.com/books/v1/volumes/${id}`)
     .then(response => {
       if (response.status === 200) {
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
       }
       return {};

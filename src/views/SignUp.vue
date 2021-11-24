@@ -86,7 +86,7 @@
               />
             </v-radio-group>
             <v-checkbox :rules="[v => !!v || 'You must agree to continue!']">
-              <template v-slot:label>
+              <template #label>
                 <div>I agree to the <a href="">Terms and Conditions</a></div>
               </template>
             </v-checkbox>
@@ -100,7 +100,7 @@
                 :loading="loading"
               >
                 Sign Up
-                <template v-slot:loader>
+                <template #loader>
                   <span class="custom-loader">
                     <v-icon light>mdi-cached</v-icon>
                   </span>

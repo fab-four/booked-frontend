@@ -5,34 +5,34 @@
       no-gutters
     >
       <v-img
-        :src="getImage((item && item.covers) ? item.covers[0] : '')"
+        :src="getImage(item)"
         class="ma-0"
         gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
         height="500"
       >
-        <template v-slot:placeholder>
+        <template #placeholder>
           <Loading />
         </template>
 
         <Overlay
-          :item="item"
+          :item="item.volumeInfo"
         />
       </v-img>
     </v-row>
 
     <v-row
-      v-if="item && item.subjects"
+      v-if="item && item.volumeInfo.categories"
       no-gutters
       justify="center"
     >
       <v-chip
-        v-for="(subject, i) in item.subjects.slice(0, 10)"
+        v-for="(category, i) in item.volumeInfo.categories.slice(0, 5)"
         :key="i"
         class="ma-1"
         color="primary"
         dark
       >
-        {{ subject }}
+        {{ category }}
       </v-chip>
     </v-row>
     <v-row
@@ -46,16 +46,10 @@
       </v-card-title>
 
       <v-card-text
-        v-if="item.description"
+        v-if="item.volumeInfo.description"
         class="text-h6"
-        style="white-space: pre-line;"
-      >
-        {{ (typeof(item.description) === 'string' ? 
-          item.description.slice(0, 200) 
-          : item.description.value.slice(0, 200)) 
-          + '...'
-        }}
-      </v-card-text>
+        v-html="item.volumeInfo.description.slice(0, 500) + (item.volumeInfo.description.length > 500 ? '...' : '')"
+      />
       <v-card-text
         v-else
         class="text-h6"
@@ -63,7 +57,7 @@
       >
         No description available.
       </v-card-text>
-      <!-- <Ratings :item="item" /> -->
+      <Ratings :item="item.volumeInfo" />
     </v-row>
 
     <v-row
@@ -92,7 +86,7 @@
         @click="
           $router.push({
             name: 'Item',
-            params: { id: item.key.split('/').pop() || $route.params.id }
+            params: { id: item.id || $route.params.id }
           })"
       >
         <v-icon>mdi-arrow-right</v-icon>
@@ -102,7 +96,7 @@
 </template>
 
 <script>
-// import Ratings from './Ratings';
+import Ratings from './Ratings';
 import Loading from './Loading';
 import Overlay from './Overlay';
 import { mapActions, mapGetters } from 'vuex';
@@ -112,7 +106,7 @@ import { getItem } from '@/utils/helpers';
 export default {
   name: 'ItemDialog',
   components: {
-    // Ratings,
+    Ratings,
     Loading,
     Overlay,
   },

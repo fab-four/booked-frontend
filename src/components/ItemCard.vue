@@ -3,15 +3,16 @@
     class="my-1"
     :width="width"
     :height="height"
+    style="cursor: pointer;"
   >
     <v-img
-      :src="getImage(item.cover_id || item.cover_i)"
+      :src="getImage(item)"
       gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
       :width="width"
       :height="height"
       @click.stop="dialog = true"
     >
-      <template v-slot:placeholder>
+      <template #placeholder>
         <Loading />
       </template>
 
@@ -21,7 +22,7 @@
           class="overlay-text px-2 text-h5"
         >
           <!-- <span v-if="item.episode_number"> #{{ item.episode_number }}: </span> -->
-          {{ item.name || item.title }}
+          {{ item.volumeInfo.title.slice(0, 50) + (item.volumeInfo.title.length > 50 ? '...' : '') }}
         </div>
       </div>
     </v-img>
@@ -32,7 +33,7 @@
         :width="dialogWidth"
       >
         <ItemDialog
-          :id="item.key.split('/').pop()"
+          :id="item.id"
           @close-dialog="dialog = false"
         />
       </v-dialog>
@@ -100,8 +101,5 @@ export default {
     color: white;
     font-style: oblique;
     font-weight: 600;
-  }
-  .v-card {
-    cursor: pointer;
   }
 </style>

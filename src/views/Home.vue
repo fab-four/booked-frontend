@@ -11,7 +11,7 @@
         label="Search"
         prepend-inner-icon="mdi-magnify"
         solo
-        @keydown.enter="onUpdate()"
+        @keydown.enter="updateCollection('query')"
       />
     </v-card-title>
 
@@ -21,6 +21,17 @@
         card-width="200"
         card-height="300"
       />
+      <div
+        v-if="collection"
+        class="text-center"
+      >
+        <v-pagination
+          v-model="page"
+          :length="Math.ceil(totalItems / 12)"
+          :total-visible="10"
+          @input="updateCollection('index')"
+        />
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -39,15 +50,24 @@ export default {
   },
   data: () => ({
     search: '',
+    page: 1,
   }),
-  computed: mapGetters(['collection', 'loading']),
+  computed: mapGetters(['collection', 'loading', 'totalItems']),
   created() {
-    this.fetchCollection(this.search);
+    this.fetchCollection({
+      query: this.search, 
+      index: (this.page - 1) * 12,
+    });
   },
   methods: {
     ...mapActions(['fetchCollection']),
-    onUpdate() {
-      this.fetchCollection(this.search);
+    updateCollection(param) {
+      if (param === 'query')
+        this.page = 1;
+      this.fetchCollection({
+        query: this.search, 
+        index: (this.page - 1) * 12,
+      });
       // console.log(this.$vuetify.breakpoint.name);
     },
   },

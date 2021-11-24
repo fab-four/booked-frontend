@@ -13,10 +13,12 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     collection: [],
+    totalItems: 0,
     // user: null,
     error: null,
     loading: false,
-    query: null,
+    query: '',
+    index : -1,
     // favorites: {},
     // item: {}
   },
@@ -24,6 +26,9 @@ export default new Vuex.Store({
   mutations: {
     setCollection(state, payload) {
       state.collection = payload;
+    },
+    setTotalItems(state, payload) {
+      state.totalItems = payload;
     },
     // setUser(state, payload) {
     //   state.user = payload;
@@ -36,6 +41,9 @@ export default new Vuex.Store({
     },
     setQuery(state, payload) {
       state.query = payload;
+    },
+    setIndex(state, payload) {
+      state.index = payload;
     },
     // setFavorites(state, payload) {
     //   state.favorites = payload;
@@ -55,11 +63,13 @@ export default new Vuex.Store({
   },
 
   actions: {
-    fetchCollection({ state, commit }, query) {
-      // console.log(query);
-      if (query === state.query || (query === '' && state.collection.length))
+    fetchCollection({ state, commit }, { query, index }) {
+      // let { query, index } = payload;
+      // console.log(query, index);
+      if ((query === state.query) && (index === state.index))
         return;
       commit('setQuery', query);
+      commit('setIndex', index);
       commit('setLoading', true);
       commit('setError', null);
       // let api_url = process.env.VUE_APP_API_URL;
@@ -69,50 +79,74 @@ export default new Vuex.Store({
       // let promiseList = [];
 
       // fetch trending movies and tv shows of the week
-      let url, params;
-      if (query === '') {
-        url = 'https://openlibrary.org/subjects/new_york_times_bestseller.json';
-        axios.get(url).then(response => {
+      // let url, params;
+      // if (query === '') {
+      //   url = 'https://openlibrary.org/subjects/new_york_times_bestseller.json';
+      //   axios.get(url).then(response => {
+      //     if (response.status === 200) {
+      //       console.log(response.data);
+      //       commit('setCollection', response.data.works.filter(obj => obj.cover_id));
+      //     }
+      //     else {
+      //       console.log('Request failed');
+      //     }
+      //     commit('setLoading', false);
+      //   })
+      //     .catch(error => {
+      //     // console.log('Some error occurred');
+      //       commit('setError', error);
+      //       commit('setLoading', false);
+      //     });
+      // }
+      // else {
+      //   console.log(query);
+      //   url = 'https://openlibrary.org/search.json';
+      //   params = {
+      //     q: query,
+      //     limit: 100,
+      //   };
+      //   axios.get(url, { params })
+      //     .then(response => {
+      //       console.log(response.config.url);
+      //       if (response.status === 200) {
+      //         console.log(response.data);
+      //         commit('setCollection', response.data.docs.filter(obj => obj.ebook_count_i));
+      //       }
+      //       else {
+      //         console.log('Request failed');
+      //       }
+      //       commit('setLoading', false);
+      //     })
+      //     .catch(error => {
+      //       // console.log('Some error occurred');
+      //       commit('setError', error);
+      //       commit('setLoading', false);
+      //     });
+      // }
+      if (query === '')
+        query = 'harry potter';
+      let url = 'https://www.googleapis.com/books/v1/volumes';
+      let params = {
+        q: query,
+        startIndex: index,
+        maxResults: 12,
+        langRestrict: 'en',
+      };
+      axios.get(url, { params })
+        .then(response => {
           if (response.status === 200) {
-            console.log(response.data);
-            commit('setCollection', response.data.works.filter(obj => obj.cover_id));
+            commit('setCollection', response.data.items);
+            commit('setTotalItems', response.data.totalItems);
           }
           else {
             console.log('Request failed');
           }
           commit('setLoading', false);
         })
-          .catch(error => {
-          // console.log('Some error occurred');
-            commit('setError', error);
-            commit('setLoading', false);
-          });
-      }
-      else {
-        console.log(query);
-        url = 'https://openlibrary.org/search.json';
-        params = {
-          q: query,
-          limit: 100,
-        };
-        axios.get(url, { params })
-          .then(response => {
-            console.log(response.config.url);
-            if (response.status === 200) {
-              console.log(response.data);
-              commit('setCollection', response.data.docs.filter(obj => obj.ebook_count_i));
-            }
-            else {
-              console.log('Request failed');
-            }
-            commit('setLoading', false);
-          })
-          .catch(error => {
-            // console.log('Some error occurred');
-            commit('setError', error);
-            commit('setLoading', false);
-          });
-      }
+        .catch(error => {
+          commit('setError', error);
+          commit('setLoading', false);
+        });
       // for (let type of ['tv', 'movie']) {
       //   collection[type] = [];
       //   // let url = api_url,
@@ -343,11 +377,20 @@ export default new Vuex.Store({
     // user: state => state.user,
     error: state => state.error,
     loading: state => state.loading,
-    getImage: () => id => {
-      if (id)
-        return `https://covers.openlibrary.org/b/id/${id}-M.jpg`;
-      return 'http://books.google.com/books/publisher/content?id=2wgyBgAAQBAJ&printsec=frontcover&img=1';
+    getImage: () => item => {
+      let defaultImage = 'http://books.google.com/books/publisher/content?id=2wgyBgAAQBAJ&printsec=frontcover&img=1';
+      let links = item.volumeInfo.imageLinks;
+      let sizes = ['extraLarge', 'large', 'medium', 'small', 'thumbnail', 'smallThumbnail'];
+      if (links) {
+        for (let size of sizes) {
+          if (size in links) 
+            return links[size];
+        }
+      }  
+      
+      return defaultImage;
     },
+    totalItems: state => state.totalItems,
     // isAuthenticated: state => {
     //   return state.user !== null && state.user != undefined;
     // },
