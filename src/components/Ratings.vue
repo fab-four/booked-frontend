@@ -1,10 +1,10 @@
 <template>
-  <div v-if="item.averageRating && item.ratingsCount">
+  <div>
     <v-card-title class="font-weight-bold text-h4">
       Ratings
     </v-card-title>
 
-    <v-card-text>
+    <v-card-text v-if="item.averageRating && item.ratingsCount">
       <v-rating
         v-model="item.averageRating"
         length="5"
@@ -16,6 +16,12 @@
         half-increments
       />
       {{ item.ratingsCount }} votes
+    </v-card-text>
+    <v-card-text
+      v-else
+      class="text-h6"
+    >
+      Information not available.
     </v-card-text>
   </div>
 </template>

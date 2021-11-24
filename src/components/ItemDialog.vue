@@ -5,20 +5,21 @@
       v-if="item"
       no-gutters
     >
-      <v-img
-        :src="getImage(item)"
-        class="ma-0"
-        gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
-        height="500"
-      >
-        <template #placeholder>
-          <Loading />
-        </template>
+      <v-col class="d-flex flex-column align-center">
+        <v-img
+          :src="getImage(item)"
+          class="ma-0"
+          gradient="to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.7)"
+          height="550px"
+          width="400px"
+        >
+          <template #placeholder>
+            <Loading />
+          </template>
 
-        <Overlay
-          :item="item.volumeInfo"
-        />
-      </v-img>
+          <Overlay :item="item.volumeInfo" />
+        </v-img>
+      </v-col>
     </v-row>
 
     <v-row
@@ -47,7 +48,12 @@
       </v-card-title>
 
       <v-card-text
-        v-if="item.volumeInfo.description"
+        v-if="item.searchInfo && item.searchInfo.description"
+        class="text-h6"
+        v-html="item.searchInfo.description"
+      />
+      <v-card-text
+        v-else-if="item.volumeInfo.description"
         class="text-h6"
         v-html="item.volumeInfo.description.slice(0, 500) + (item.volumeInfo.description.length > 500 ? '...' : '')"
       />
@@ -101,8 +107,6 @@ import Ratings from './Ratings';
 import Loading from './Loading';
 import Overlay from './Overlay';
 import { mapActions, mapGetters } from 'vuex';
-import { getItem } from '@/utils/helpers';
-// import { cloneDeep } from 'lodash';
 
 export default {
   name: 'ItemDialog',
@@ -112,33 +116,24 @@ export default {
     Overlay,
   },
   props: {
-    id: {
-      type: String,
-      default: '',
+    item: {
+      type: Object,
+      default: () => {},
     },
   },
   data: () => ({
-    item: {},
+    // item: {},
   }),
   computed: {
     ...mapGetters(['getImage']),
-    // isFavorite() {
-    //   return (this.user.favorites[this.item.type] || []).includes(
-    //     this.item.id,
-    //   );
-    // },
-    // userData() {
-    //   return cloneDeep(this.user);
-    // },
   },
-  asyncComputed: {
-    async item() {
-      return getItem(this.id);
-    },
-  },
+  // asyncComputed: {
+  //   async item() {
+  //     return getItem(this.id);
+  //   },
+  // },
   methods: {
     ...mapActions(['updateUserData', 'removeFromFavorites']),
-    // remove item from user favorites if there, otherwise add the item to user favorites
     onClick() {
       if (this.isFavorite) {
         this.$emit('close-dialog');
@@ -153,7 +148,6 @@ export default {
         }
         this.userData.favorites[this.item.type].push(this.item.id);
       }
-      // console.log(this.userData.favorites);
       this.updateUserData({
         userData: this.userData,
         loading: false,
@@ -170,7 +164,7 @@ export default {
   span {
     display: block;
   }
-  /* img {
-    background-size: cover;
-  } */
+  .v-image >>> .v-image__image {
+    background-size: 100% 100%;
+  }
 </style>

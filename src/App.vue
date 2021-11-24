@@ -50,7 +50,7 @@
           :key="item.title"
           text
           dark
-          :to="item.link"
+          :to="{name: item.name}"
         >
           <v-icon
             left
@@ -79,25 +79,21 @@
     <v-main>
       <router-view :key="$route.fullPath" />
     </v-main>
-    <!-- <Snackbar text="Failed to logout!" v-model="showSnackbar" /> -->
   </v-app>
 </template>
 
 <script>
 import NavigationMenu from '@/components/NavigationMenu';
 import { mapGetters, mapActions } from 'vuex';
-// import Snackbar from '@/components/Snackbar';
 
 export default {
   components: {
     NavigationMenu,
-    // Snackbar
   },
   data() {
     return {
       appName: 'Booked',
       drawer: false,
-      // showSnackbar: false
     };
   },
   computed: {
@@ -105,17 +101,12 @@ export default {
     ...mapGetters(['loading']),
     menuItems() {
       let menuItems = [
-        { icon: 'mdi-account-plus', title: 'Sign Up', link: '/signup' },
-        { icon: 'mdi-lock', title: 'Sign In', link: '/signin' },
+        { icon: 'mdi-account-plus', title: 'Sign Up', name: 'SignUp' },
+        { icon: 'mdi-lock', title: 'Sign In', name: 'SignIn' },
       ];
       if (this.isAuthenticated) {
         menuItems = [
-          { icon: 'mdi-account', title: 'Profile', link: '/profile' },
-          // {
-          //   icon: 'mdi-heart-multiple',
-          //   title: 'Favorites',
-          //   link: '/favorites',
-          // },
+          { icon: 'mdi-account', title: 'Profile', name: 'Profile' },
         ];
       }
       return menuItems;

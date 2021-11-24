@@ -21,18 +21,14 @@
       cols="12"
       class="px-2 subtitle-1"
     >
-      {{ item.publishedDate }}
-      <!-- <span v-if="item.first_air_date">
-        ({{ item.first_air_date.split('-')[0] }})
-      </span>
-      <span v-if="item.release_date">
-        ({{ item.release_date.split('-')[0] }})
-      </span> -->
+      {{ formattedDate(item.publishedDate) }}
     </v-col>
   </v-row>
 </template>
 
 <script>
+import { formattedDate } from '@/utils/helpers';
+
 export default {
   name: 'Overlay',
   props: {
@@ -40,6 +36,9 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  methods: {
+    formattedDate,
   },
 };
 </script>

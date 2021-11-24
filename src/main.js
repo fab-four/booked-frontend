@@ -3,25 +3,36 @@ import App from './App';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
-// import 'material-design-icons-iconfont/dist/material-design-icons.css';
-// import '@/firebase/';
 import Alert from '@/components/Alert';
 import AsyncComputed from 'vue-async-computed';
+import { api } from '@/utils/services';
 
 Vue.use(AsyncComputed);
-// import firebase from 'firebase/app';
 
 Vue.config.productionTip = false;
 Vue.component('app-alert', Alert);
 
-// firebase.auth().onAuthStateChanged(user => {
-//   if (user) {
-//     store.dispatch('autoSignIn', user);
-//   }
-// });
 new Vue({
   router,
   store,
   vuetify,
+  created() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      api('/auth/getProfile', {}).then((response) => {
+        if (response.success) {
+          this.$store.commit('setUserData', {token, user: response.user});
+          // if (response.user.isAdmin) {
+          //   this.$router.push({name: 'Admin'});
+          // }
+          // else {
+          //   this.$router.push({name: 'A1'});
+          // }
+        } else {
+          localStorage.removeItem('token');
+        }
+      });
+    }
+  },
   render: h => h(App),
 }).$mount('#app');

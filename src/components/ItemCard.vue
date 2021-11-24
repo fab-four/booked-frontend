@@ -1,5 +1,6 @@
 <template>
   <v-card
+    v-if="item && item.id"
     class="my-1"
     :width="width"
     :height="height"
@@ -21,7 +22,6 @@
           cols="12"
           class="overlay-text px-2 text-h5"
         >
-          <!-- <span v-if="item.episode_number"> #{{ item.episode_number }}: </span> -->
           {{ item.volumeInfo.title.slice(0, 50) + (item.volumeInfo.title.length > 50 ? '...' : '') }}
         </div>
       </div>
@@ -33,7 +33,7 @@
         :width="dialogWidth"
       >
         <ItemDialog
-          :id="item.id"
+          :item="item"
           @close-dialog="dialog = false"
         />
       </v-dialog>
@@ -45,6 +45,7 @@
 import ItemDialog from './ItemDialog';
 import Loading from './Loading';
 import { mapGetters } from 'vuex';
+import { getItem } from '@/utils/helpers';
 
 export default {
   name: 'ItemCard',
@@ -53,9 +54,9 @@ export default {
     Loading,
   },
   props: {
-    item: {
-      type: Object,
-      default: () => {},
+    id: {
+      type: String,
+      default: '',
     },
     width: {
       type: String,
@@ -69,6 +70,7 @@ export default {
   data() {
     return {
       dialog: false,
+      item: {},
     };
   },
   computed: {
@@ -77,9 +79,16 @@ export default {
       switch (this.$vuetify.breakpoint.name) {
       case 'xs':
         return this.$vuetify.breakpoint.width;
+      case 'sm':
+        return this.$vuetify.breakpoint.width / 1.5;
       default:
         return this.$vuetify.breakpoint.width / 2;
       }
+    },
+  },
+  asyncComputed: {
+    async item() {
+      return getItem(this.id);
     },
   },
 };

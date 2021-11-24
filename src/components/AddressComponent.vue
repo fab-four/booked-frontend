@@ -79,8 +79,6 @@ export default {
   },
   async mounted() {
     this.countryOptions = await getCountries();
-    if (this.$refs.form)
-      this.$refs.form.validate();
   },
   asyncComputed: {
     async stateOptions() {

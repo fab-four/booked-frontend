@@ -23,7 +23,7 @@
             Register
           </v-card-title>
           <v-form
-            v-model="formValid"
+            v-model="valid"
             @submit.prevent="onSubmit"
           >
             <v-text-field
@@ -48,6 +48,7 @@
               prepend-inner-icon="mdi-account"
               name="lastName"
               label="Last Name"
+              :rules="[rules.required]"
               outlined
             />
             <v-text-field
@@ -77,7 +78,7 @@
             <v-radio-group
               v-model="sex"
               row
-              :rules="[v => !!v || 'Item is required']"
+              :rules="[rules.required]"
             >
               <v-radio
                 on-icon="mdi-gender-male"
@@ -95,18 +96,18 @@
                 value="Other"
               />
             </v-radio-group>
-            <!-- <v-checkbox :rules="[v => !!v || 'You must agree to continue!']">
+            <v-checkbox v-model="isSeller">
               <template #label>
-                <div>I agree to the <a href="">Terms and Conditions</a></div>
+                <span>Register as a Seller</span>
               </template>
-            </v-checkbox> -->
+            </v-checkbox>
             <v-card-actions>
               <v-btn
                 color="primary"
                 large
                 block
                 type="submit"
-                :disabled="!formValid || loading"
+                :disabled="!valid || loading"
                 :loading="loading"
               >
                 Sign Up
@@ -144,13 +145,14 @@ export default {
   name: 'SignUp',
   data() {
     return {
-      formValid: false,
+      valid: false,
       firstName: '',
       lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
       sex: '',
+      isSeller: false,
       rules: {
         required: value => !!value || 'Required',
         email: value => {
@@ -202,6 +204,7 @@ export default {
             lastName: this.lastName,
             sex: this.sex,
           },
+          isSeller: this.isSeller,
         },
       });
     },

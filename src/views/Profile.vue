@@ -31,44 +31,24 @@
             Account Details
           </v-card-title>
           <v-card-text>
-            <!-- <v-row
-              justify="space-around"
-              class="my-5"
-            >
-              <v-avatar
-                color="orange"
-                size="96"
-              >
-                <span class="white--text">Profile Picture</span>
-              </v-avatar>
-            </v-row>
-
-            <v-row
-              justify="space-around"
-              class="mb-3"
-            >
-              <v-btn dark>
-                Change Avatar
-              </v-btn>
-            </v-row> -->
             <v-row dense>
               <v-col :cols="cols">
                 <v-text-field
-                  v-model="details.firstName"
+                  v-model="user.personalDetails.firstName"
                   label="First Name"
                   outlined
                 />
               </v-col>
               <v-col :cols="cols">
                 <v-text-field
-                  v-model="details.lastName"
+                  v-model="user.personalDetails.lastName"
                   label="Last Name"
                   outlined
                 />
               </v-col>
               <v-col :cols="cols">
                 <v-text-field
-                  v-model="details.mobile"
+                  v-model="user.personalDetails.mobile"
                   label="Mobile Number"
                   :rules="[rules.mobileNumber]"
                   outlined
@@ -85,7 +65,7 @@
                 >
                   <template #activator="{ on, attrs }">
                     <v-text-field
-                      :value="formattedDate(details.dateOfBirth)"
+                      :value="formattedDate(user.personalDetails.dateOfBirth)"
                       label="Date of Birth"
                       outlined
                       v-bind="attrs"
@@ -94,7 +74,7 @@
                     />
                   </template>
                   <v-date-picker
-                    v-model="details.dateOfBirth"
+                    v-model="user.personalDetails.dateOfBirth"
                     no-title
                     :show-current="false"
                     :max="new Date().toISOString().slice(0, 10)"
@@ -104,7 +84,7 @@
               </v-col>
               <v-col :cols="12">
                 <v-radio-group
-                  v-model="details.sex"
+                  v-model="user.personalDetails.sex"
                   row
                   :rules="[v => !!v || 'Item is required']"
                 >
@@ -126,7 +106,7 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-            <address-component :address="address" />
+            <address-component :address="user.personalDetails.address" />
             <!-- <v-text-field
               v-model="password"
               label="Password"
@@ -168,7 +148,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { formattedDate } from '@/utils/helpers';
-import { cloneDeep } from 'lodash';
 import AddressComponent from '../components/AddressComponent.vue';
 
 export default {
@@ -176,7 +155,6 @@ export default {
   components: { AddressComponent },
   data() {
     return {
-      // show: false,
       rules: {
         mobileNumber: value => {
           const pattern = /(^$)|(^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$)/;
@@ -189,12 +167,6 @@ export default {
   },
   computed: {
     ...mapGetters(['user', 'loading', 'error']),
-    details() {
-      return cloneDeep(this.user.personalDetails);
-    },
-    address() {
-      return cloneDeep(this.user.personalDetails.address);
-    },
     // password() {
     //   return this.user.password;
     // },
@@ -231,10 +203,9 @@ export default {
     ...mapActions(['updateUserData', 'clearError']),
     formattedDate,
     onSave() {
-      this.details.address = this.address;
       this.updateUserData({
         user: {
-          personalDetails: this.details,
+          personalDetails: this.user.personalDetails,
         }, 
         message: 'Data updated successfully!',
       });

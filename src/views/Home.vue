@@ -68,7 +68,6 @@ export default {
         query: this.search, 
         index: (this.page - 1) * 12,
       });
-      // console.log(this.$vuetify.breakpoint.name);
     },
   },
 };

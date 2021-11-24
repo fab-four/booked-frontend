@@ -11,16 +11,13 @@
           class="d-flex justify-center"
         >
           <ItemCard
-            :item="item"
+            :id="item.id"
             :width="cardWidth"
             :height="cardHeight"
           />
         </v-col>
       </template>
     </v-row>
-    <!-- <v-row v-else class="text-xl-h1 text-center justify-center grey--text">
-      No items found
-    </v-row> -->
   </v-container>
 </template>
 
