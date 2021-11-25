@@ -1,10 +1,10 @@
 <template>
   <!-- eslint-disable vue/no-v-html -->
-  <v-card flat>
-    <v-row
-      v-if="item"
-      no-gutters
-    >
+  <v-card
+    v-if="item && item.id"
+    flat
+  >
+    <v-row no-gutters>
       <v-col class="d-flex flex-column align-center">
         <v-img
           :src="getImage(item)"
@@ -27,82 +27,11 @@
       justify="center"
       no-gutters
     >
-      <v-card-actions>
-        <v-btn
-          fab
-          color="primary"
-          @click="dialog = true"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-      </v-card-actions>
-      <v-card-text
-        v-if="sellerInfo.quantity"
-        class="subtitle-1 text-center pa-0 ma-0"
-      >
-        {{ sellerInfo.quantity }} left in stock
-      </v-card-text>
-      <v-card-text
-        v-else
-        class="subtitle-1 text-center pa-0 ma-0"
-      >
-        Not available in stock
-      </v-card-text>
+      <add-item-button :id="item.id" />
     </v-row>
-    
-    <v-row justify="center">
-      <v-dialog
-        v-model="dialog"
-        persistent
-      >
-        <v-card>
-          <v-card-title>
-            Update
-          </v-card-title>
-          <v-card-text>
-            <v-form @submit.prevent="updateSellerInfo">
-              <v-text-field
-                v-model="sellerInfo.price"
-                type="number"
-                label="Price"
-                outlined
-                dense
-              />
-              <v-text-field
-                v-model="sellerInfo.quantity"
-                type="number"
-                label="Quantity"
-                outlined
-                dense
-              />
-              <v-card-actions>
-                <v-spacer />
-                <v-btn
-                  color="error"
-                  text
-                  class="px-1"
-                  @click="dialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="success"
-                  type="submit"
-                  text
-                  class="px-1"
-                >
-                  Update
-                </v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-    </v-row>
-
 
     <v-row
-      v-if="item && item.volumeInfo.categories"
+      v-if="item.volumeInfo.categories"
       no-gutters
       justify="center"
     >
@@ -117,10 +46,8 @@
         {{ category }}
       </v-chip>
     </v-row>
-    <v-row
-      v-if="item"
-      class="px-2 mx-0"
-    >
+    
+    <v-row class="px-2 mx-0">
       <v-card-title
         class="font-weight-bold text-h4 py-3"
       >
@@ -186,7 +113,9 @@
 import Ratings from './Ratings';
 import Loading from './Loading';
 import Overlay from './Overlay';
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
+import { getItem } from '@/utils/helpers';
+import AddItemButton from './AddItemButton.vue';
 
 export default {
   name: 'ItemDialog',
@@ -194,74 +123,21 @@ export default {
     Ratings,
     Loading,
     Overlay,
+    AddItemButton,
   },
   props: {
-    item: {
-      type: Object,
-      default: () => {},
+    id: {
+      type: String,
+      default: '',
     },
   },
-  data: () => ({
-    // item: {},
-    dialog: false,
-  }),
+  data: () => ({}),
   computed: {
     ...mapGetters(['getImage', 'user', 'isAuthenticated']),
-    sellerInfo() {
-      let info = {};
-      if (this.isAuthenticated && this.user.isSeller) {
-        let book = this.user.seller.books.filter(obj => obj.bookId === this.item.id);
-        if (book.length) {
-          info =  {
-            price: book[0].price,
-            quantity: book[0].quantity,
-          };
-        }
-      }
-      return info;
-    },
   },
-  // asyncComputed: {
-  //   async item() {
-  //     return getItem(this.id);
-  //   },
-  // },
-  methods: {
-    ...mapActions(['updateUserData']),
-    // onClick() {
-    //   if (this.isFavorite) {
-    //     this.$emit('close-dialog');
-    //     this.userData.favorites[this.item.type].splice(
-    //       this.userData.favorites[this.item.type].indexOf(this.item.id),
-    //       1,
-    //     );
-    //     this.removeFromFavorites({ type: this.item.type, id: this.item.id });
-    //   } else {
-    //     if (!this.userData.favorites[this.item.type]) {
-    //       this.userData.favorites[this.item.type] = [];
-    //     }
-    //     this.userData.favorites[this.item.type].push(this.item.id);
-    //   }
-    //   this.updateUserData({
-    //     userData: this.userData,
-    //     loading: false,
-    //   });
-    // },
-    updateSellerInfo() {
-      this.dialog = false;
-      let books = this.user.seller.books.filter(obj => (obj.bookId !== this.item.id));
-      books.push({
-        bookId: this.item.id,
-        price: this.sellerInfo.price,
-        quantity: this.sellerInfo.quantity,
-      });
-      this.updateUserData({
-        user: {
-          seller: {
-            books,
-          },
-        },
-      });
+  asyncComputed: {
+    async item() {
+      return getItem(this.id);
     },
   },
 };

@@ -33,7 +33,7 @@
         :width="dialogWidth"
       >
         <ItemDialog
-          :item="item"
+          :id="item.id"
           @close-dialog="dialog = false"
         />
       </v-dialog>

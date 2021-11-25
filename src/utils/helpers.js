@@ -1,6 +1,11 @@
 import axios from 'axios';
 import moment from 'moment';
+import store from '../store';
+
 export const getItem = async (id) => {
+  let item = store.getters.collection.filter(obj => obj.id === id);
+  if (item.length)
+    return item[0];
   return await axios.get(`https://www.googleapis.com/books/v1/volumes/${id}`)
     .then(response => {
       if (response.status === 200) {
