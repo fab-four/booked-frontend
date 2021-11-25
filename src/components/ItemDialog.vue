@@ -21,6 +21,85 @@
         </v-img>
       </v-col>
     </v-row>
+    
+    <v-row
+      v-if="isAuthenticated && user.isSeller"
+      justify="center"
+      no-gutters
+    >
+      <v-card-actions>
+        <v-btn
+          fab
+          color="primary"
+          @click="dialog = true"
+        >
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+      </v-card-actions>
+      <v-card-text
+        v-if="sellerInfo.quantity"
+        class="subtitle-1 text-center pa-0 ma-0"
+      >
+        {{ sellerInfo.quantity }} left in stock
+      </v-card-text>
+      <v-card-text
+        v-else
+        class="subtitle-1 text-center pa-0 ma-0"
+      >
+        Not available in stock
+      </v-card-text>
+    </v-row>
+    
+    <v-row justify="center">
+      <v-dialog
+        v-model="dialog"
+        persistent
+      >
+        <v-card>
+          <v-card-title>
+            Update
+          </v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="updateSellerInfo">
+              <v-text-field
+                v-model="sellerInfo.price"
+                type="number"
+                label="Price"
+                outlined
+                dense
+              />
+              <v-text-field
+                v-model="sellerInfo.quantity"
+                type="number"
+                label="Quantity"
+                outlined
+                dense
+              />
+              <v-card-actions>
+                <v-spacer />
+                <v-btn
+                  color="error"
+                  text
+                  class="px-1"
+                  @click="dialog = false"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  color="success"
+                  type="submit"
+                  text
+                  class="px-1"
+                >
+                  Update
+                </v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </v-row>
+
 
     <v-row
       v-if="item && item.volumeInfo.categories"
@@ -33,6 +112,7 @@
         class="ma-1"
         color="primary"
         dark
+        label
       >
         {{ category }}
       </v-chip>
@@ -123,9 +203,23 @@ export default {
   },
   data: () => ({
     // item: {},
+    dialog: false,
   }),
   computed: {
-    ...mapGetters(['getImage']),
+    ...mapGetters(['getImage', 'user', 'isAuthenticated']),
+    sellerInfo() {
+      let info = {};
+      if (this.isAuthenticated && this.user.isSeller) {
+        let book = this.user.seller.books.filter(obj => obj.bookId === this.item.id);
+        if (book.length) {
+          info =  {
+            price: book[0].price,
+            quantity: book[0].quantity,
+          };
+        }
+      }
+      return info;
+    },
   },
   // asyncComputed: {
   //   async item() {
@@ -133,24 +227,40 @@ export default {
   //   },
   // },
   methods: {
-    ...mapActions(['updateUserData', 'removeFromFavorites']),
-    onClick() {
-      if (this.isFavorite) {
-        this.$emit('close-dialog');
-        this.userData.favorites[this.item.type].splice(
-          this.userData.favorites[this.item.type].indexOf(this.item.id),
-          1,
-        );
-        this.removeFromFavorites({ type: this.item.type, id: this.item.id });
-      } else {
-        if (!this.userData.favorites[this.item.type]) {
-          this.userData.favorites[this.item.type] = [];
-        }
-        this.userData.favorites[this.item.type].push(this.item.id);
-      }
+    ...mapActions(['updateUserData']),
+    // onClick() {
+    //   if (this.isFavorite) {
+    //     this.$emit('close-dialog');
+    //     this.userData.favorites[this.item.type].splice(
+    //       this.userData.favorites[this.item.type].indexOf(this.item.id),
+    //       1,
+    //     );
+    //     this.removeFromFavorites({ type: this.item.type, id: this.item.id });
+    //   } else {
+    //     if (!this.userData.favorites[this.item.type]) {
+    //       this.userData.favorites[this.item.type] = [];
+    //     }
+    //     this.userData.favorites[this.item.type].push(this.item.id);
+    //   }
+    //   this.updateUserData({
+    //     userData: this.userData,
+    //     loading: false,
+    //   });
+    // },
+    updateSellerInfo() {
+      this.dialog = false;
+      let books = this.user.seller.books.filter(obj => (obj.bookId !== this.item.id));
+      books.push({
+        bookId: this.item.id,
+        price: this.sellerInfo.price,
+        quantity: this.sellerInfo.quantity,
+      });
       this.updateUserData({
-        userData: this.userData,
-        loading: false,
+        user: {
+          seller: {
+            books,
+          },
+        },
       });
     },
   },

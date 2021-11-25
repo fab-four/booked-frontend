@@ -21,12 +21,12 @@ new Vue({
     if (token) {
       api('/auth/getProfile', {}).then((response) => {
         if (response.success) {
-          this.$store.commit('setUserData', {token, user: response.user});
+          store.commit('setUserData', {token, user: response.user});
           // if (response.user.isAdmin) {
-          //   this.$router.push({name: 'Admin'});
+          //   router.push({name: 'Admin'});
           // }
           // else {
-          //   this.$router.push({name: 'A1'});
+          //   router.push({name: 'A1'});
           // }
         } else {
           localStorage.removeItem('token');
