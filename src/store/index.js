@@ -98,7 +98,32 @@ export default new Vuex.Store({
         })
         .finally(() => commit('setLoading', false));
     },
-
+    autoSignIn({ commit }) {
+      return new Promise((resolve) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          api('/auth/getProfile', {}).then((response) => {
+            if (response.success) {
+              commit('setUserData', {token, user: response.user});
+              // if (response.user.isAdmin) {
+              //   router.push({name: 'Admin'});
+              // }
+              // else {
+              //   router.push({name: 'A1'});
+              // }
+            } else {
+              localStorage.removeItem('token');
+            }
+          })
+            .catch(console.log)
+            .finally(() => resolve());
+        }
+        else {
+          resolve();
+        }
+      });
+      
+    },
     userSignOut({ commit }) {
       commit('setUserData', { token: null, user: null });
       localStorage.removeItem('token');

@@ -108,6 +108,13 @@ export default {
         menuItems = [
           { icon: 'mdi-account', title: 'Profile', name: 'Profile' },
         ];
+        if (this.user.isSeller) {
+          menuItems.push({ 
+            icon: 'mdi-cart', 
+            title: 'Catalogue', 
+            name: 'Catalogue', 
+          });
+        }
       }
       return menuItems;
     },

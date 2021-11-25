@@ -5,7 +5,6 @@ import store from './store';
 import vuetify from './plugins/vuetify';
 import Alert from '@/components/Alert';
 import AsyncComputed from 'vue-async-computed';
-import { api } from '@/utils/services';
 
 Vue.use(AsyncComputed);
 
@@ -17,22 +16,7 @@ new Vue({
   store,
   vuetify,
   created() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      api('/auth/getProfile', {}).then((response) => {
-        if (response.success) {
-          store.commit('setUserData', {token, user: response.user});
-          // if (response.user.isAdmin) {
-          //   router.push({name: 'Admin'});
-          // }
-          // else {
-          //   router.push({name: 'A1'});
-          // }
-        } else {
-          localStorage.removeItem('token');
-        }
-      });
-    }
+    store.dispatch('autoSignIn');
   },
   render: h => h(App),
 }).$mount('#app');

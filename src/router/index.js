@@ -5,6 +5,8 @@ import Home from '../views/Home';
 import SignIn from '../views/SignIn';
 import SignUp from '../views/SignUp';
 import Profile from '../views/Profile';
+import Catalogue from '../views/Catalogue';
+import store from '../store';
 
 Vue.use(VueRouter);
 
@@ -45,6 +47,15 @@ const routes = [
     },
   },
   {
+    path: '/catalogue',
+    name: 'Catalogue',
+    component: Catalogue,
+    meta: {
+      requiresAuth: true,
+      requiresSeller: true,
+    },
+  },
+  {
     path: '*',
     name: 'Invalid Path',
     component: Home,
@@ -59,21 +70,27 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  let isAuthenticated = !!localStorage.getItem('token');
-  if (to.matched.some((route) => route.meta.requiresAuth)) {
-    if (!isAuthenticated) {
-      next({ name: 'SignIn' });
-    } else {
-      next();
-    }
-  } else if (to.matched.some((record) => record.meta.requiresGuest)) {
-    if (isAuthenticated) {
-      next({ name: 'Home' });
-    } else {
-      next();
-    }
-  } else {
-    next();
-  }
+  store.dispatch('autoSignIn')
+    .then(() => {
+      let isAuthenticated = store.getters.isAuthenticated;
+      if (to.matched.some((route) => route.meta.requiresAuth)) {
+        if (!isAuthenticated) {
+          next({ name: 'SignIn' });
+        } else if (to.meta.requiresSeller && !store.getters.user.isSeller) {
+          next({ name: 'Home' });
+        } else {
+          next();
+        }
+      } else if (to.matched.some((record) => record.meta.requiresGuest)) {
+        if (isAuthenticated) {
+          next({ name: 'Home' });
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
+    });
+  
 });
 export default router;
