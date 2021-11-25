@@ -4,7 +4,10 @@
       Ratings
     </v-card-title>
 
-    <v-card-text v-if="item.averageRating && item.ratingsCount">
+    <v-card-text
+      v-if="item.averageRating && item.ratingsCount"
+      class="text-center"
+    >
       <v-rating
         v-model="item.averageRating"
         length="5"

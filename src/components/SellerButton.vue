@@ -82,7 +82,7 @@ import { mapGetters, mapActions } from 'vuex';
 import { getItem } from '@/utils/helpers';
 
 export default {
-  name: 'AddItemButton',
+  name: 'SellerButton',
   props: {
     id: {
       type: String,
@@ -100,7 +100,7 @@ export default {
     valid: false,
   }),
   computed: {
-    ...mapGetters(['getImage', 'user']),
+    ...mapGetters(['user']),
     sellerInfo() {
       let info = {};
       if (this.item) {
@@ -117,7 +117,7 @@ export default {
   },
   asyncComputed: {
     async item() {
-      return getItem(this.id);
+      return await getItem(this.id);
     },
   },
   watch: {

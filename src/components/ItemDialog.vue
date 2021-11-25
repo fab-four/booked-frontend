@@ -27,9 +27,17 @@
       justify="center"
       no-gutters
     >
-      <add-item-button :id="item.id" />
+      <seller-button :id="item.id" />
     </v-row>
-
+    
+    <v-row
+      v-if="isAuthenticated && !user.isSeller"
+      justify="center"
+      no-gutters
+    >
+      <buyer-button :id="item.id" />
+    </v-row>
+    
     <v-row
       v-if="item.volumeInfo.categories"
       no-gutters
@@ -115,7 +123,8 @@ import Loading from './Loading';
 import Overlay from './Overlay';
 import { mapGetters } from 'vuex';
 import { getItem } from '@/utils/helpers';
-import AddItemButton from './AddItemButton.vue';
+import SellerButton from './SellerButton';
+import BuyerButton from './BuyerButton';
 
 export default {
   name: 'ItemDialog',
@@ -123,7 +132,8 @@ export default {
     Ratings,
     Loading,
     Overlay,
-    AddItemButton,
+    SellerButton,
+    BuyerButton,
   },
   props: {
     id: {
@@ -137,7 +147,7 @@ export default {
   },
   asyncComputed: {
     async item() {
-      return getItem(this.id);
+      return await getItem(this.id);
     },
   },
 };

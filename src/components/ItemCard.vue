@@ -88,7 +88,7 @@ export default {
   },
   asyncComputed: {
     async item() {
-      return getItem(this.id);
+      return await getItem(this.id);
     },
   },
 };

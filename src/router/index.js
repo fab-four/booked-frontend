@@ -6,6 +6,7 @@ import SignIn from '../views/SignIn';
 import SignUp from '../views/SignUp';
 import Profile from '../views/Profile';
 import Catalogue from '../views/Catalogue';
+import Favorites from '../views/Favorites';
 import store from '../store';
 
 Vue.use(VueRouter);
@@ -56,6 +57,15 @@ const routes = [
     },
   },
   {
+    path: '/mybooks',
+    name: 'Favorites',
+    component: Favorites,
+    meta: {
+      requiresAuth: true,
+      requiresBuyer: true,
+    },
+  },
+  {
     path: '*',
     name: 'Invalid Path',
     component: Home,
@@ -77,6 +87,8 @@ router.beforeEach((to, from, next) => {
         if (!isAuthenticated) {
           next({ name: 'SignIn' });
         } else if (to.meta.requiresSeller && !store.getters.user.isSeller) {
+          next({ name: 'Home' });
+        }  else if (to.meta.requiresBuyer && store.getters.user.isSeller) {
           next({ name: 'Home' });
         } else {
           next();

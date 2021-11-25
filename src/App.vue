@@ -39,8 +39,7 @@
         indeterminate
         absolute
         bottom
-        height="6"
-        color="black"
+        color="white"
       />
 
       <v-spacer />
@@ -113,6 +112,13 @@ export default {
             icon: 'mdi-cart', 
             title: 'Catalogue', 
             name: 'Catalogue', 
+          });
+        }
+        else {
+          menuItems.push({ 
+            icon: 'mdi-bookmark-multiple', 
+            title: 'My Books', 
+            name: 'Favorites', 
           });
         }
       }

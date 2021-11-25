@@ -35,34 +35,6 @@
               <Overlay :item="item.volumeInfo" />
             </v-img>
             <Ratings :item="item.volumeInfo" />
-            <v-card flat>
-              <v-card-actions class="buyerAttributes">
-                <BuyerAttributes
-                  icon1="mdi-cards-heart"
-                  icon2="mdi-cards-heart-outline"
-                  tooltip1="Remove from favourites"
-                  tooltip2="Add to favourites"
-                  :rows="user.buyer.favourites"
-                  :item="item"
-                />
-                <BuyerAttributes
-                  icon1="mdi-bookmark"
-                  icon2="mdi-bookmark-outline"
-                  tooltip1="Remove from Bookmark"
-                  tooltip2="Add to Bookmark"
-                  :rows="user.buyer.toRead"
-                  :item="item"
-                />
-                <BuyerAttributes
-                  icon1="mdi-checkbox-marked-circle-outline"
-                  icon2="mdi-checkbox-marked-circle-plus-outline"
-                  tooltip1="Remove from Reading"
-                  tooltip2="Add to Reading"
-                  :rows="user.buyer.read"
-                  :item="item"
-                />
-              </v-card-actions>
-            </v-card>
           </div>
 
           <v-row
@@ -70,7 +42,15 @@
             justify="center"
             no-gutters
           >
-            <add-item-button :id="item.id" />
+            <seller-button :id="item.id" />
+          </v-row>
+          
+          <v-row
+            v-if="isAuthenticated && !user.isSeller"
+            justify="center"
+            no-gutters
+          >
+            <buyer-button :id="item.id" />
           </v-row>
         </v-col>
         
@@ -236,8 +216,8 @@ import { getItem } from '@/utils/helpers';
 import Ratings from '@/components/Ratings';
 import Loading from '@/components/Loading';
 import Overlay from '@/components/Overlay';
-import BuyerAttributes from '@/components/BuyerAttributes';
-import AddItemButton from '@/components/AddItemButton';
+import SellerButton from '@/components/SellerButton';
+import BuyerButton from '@/components/BuyerButton';
 
 export default {
   name: 'Item',
@@ -245,8 +225,8 @@ export default {
     Ratings,
     Loading,
     Overlay,
-    BuyerAttributes,
-    AddItemButton,
+    SellerButton,
+    BuyerButton,
   },
   props: {
     id: {
@@ -268,7 +248,7 @@ export default {
   },
   asyncComputed: {
     async item() {
-      return getItem(this.id);
+      return await getItem(this.id);
     },
   },
   methods: {
@@ -291,8 +271,5 @@ export default {
   }
   .v-image >>> .v-image__image {
     background-size: 100% 100%;
-  }
-  .buyerAttributes {
-    margin-bottom: 50px;
   }
 </style>

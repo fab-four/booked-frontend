@@ -4,12 +4,21 @@
     tile
     class="indigo darken-3"
   >
-    <v-card-text class="white">
+    <v-card-text
+      v-if="catalogue.length"
+      class="white"
+    >
       <CollectionCard
         :collection="catalogue"
         card-width="200"
         card-height="300"
       />
+    </v-card-text>
+    <v-card-text
+      v-else
+      class="text-center white title"
+    >
+      No items available.
     </v-card-text>
   </v-card>
 </template>

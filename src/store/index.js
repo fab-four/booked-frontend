@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import { api } from '@/utils/services';
 import router from '@/router';
+import _ from 'lodash';
 
 Vue.use(Vuex);
 
@@ -42,10 +43,7 @@ export default new Vuex.Store({
         state.token = data.token;
         localStorage.setItem('token', data.token);
       }
-      // Object.keys(data.user).forEach((key) => {
-      //   state.user[key] = data.user[key];
-      // });
-      state.user = Object.assign({}, state.user, data.user);
+      state.user = _.merge(state.user, data.user);
     },
   },
 
@@ -90,7 +88,7 @@ export default new Vuex.Store({
       commit('setError', null);
       api(path, data)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response.success) {
             commit('setUserData', response);
             router.push({ name: 'Home' });
@@ -134,11 +132,12 @@ export default new Vuex.Store({
       location.reload();
     },
 
-    updateUserData({ commit }, { user, loading = true, message = '' }) {
+    updateUserData({ state, commit }, { user, loading = true, message = '' }) {
       commit('setLoading', loading);
       commit('setError', null);
       commit('setUserData', { user });
-      api('/auth/updateDetails', user)
+      
+      api('/auth/updateDetails', state.user)
         .then((response) => {
           if (response.success) {
             console.log(message);

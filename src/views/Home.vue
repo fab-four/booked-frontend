@@ -15,23 +15,29 @@
       />
     </v-card-title>
 
-    <v-card-text class="white">
+    <v-card-text
+      v-if="collectionIds.length"
+      class="white"
+    >
       <CollectionCard
-        :collection="collection"
+        :collection="collectionIds"
         card-width="200"
         card-height="300"
       />
-      <div
-        v-if="collection"
-        class="text-center"
-      >
+      <div class="text-center">
         <v-pagination
-          v-if="!loading || collection.length"
+          v-if="!loading || collectionIds.length"
           v-model="page"
           :length="Math.min(Math.ceil(totalItems / 12), 10)"
           @input="updateCollection('index')"
         />
       </div>
+    </v-card-text>
+    <v-card-text
+      v-else
+      class="text-center white title"
+    >
+      No items available.
     </v-card-text>
   </v-card>
 </template>
@@ -52,7 +58,12 @@ export default {
     search: '',
     page: 1,
   }),
-  computed: mapGetters(['collection', 'loading', 'totalItems']),
+  computed: {
+    ...mapGetters(['collection', 'loading', 'totalItems']),
+    collectionIds() {
+      return this.collection.map(obj => { return { id: obj.id }; });
+    },
+  },
   created() {
     this.fetchCollection({
       query: this.search, 

@@ -148,7 +148,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { formattedDate } from '@/utils/helpers';
-import AddressComponent from '../components/AddressComponent.vue';
+import AddressComponent from '@/components/AddressComponent';
 
 export default {
   name: 'Profile',

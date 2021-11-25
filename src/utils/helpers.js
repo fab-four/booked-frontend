@@ -2,70 +2,84 @@ import axios from 'axios';
 import moment from 'moment';
 import store from '../store';
 
-export const getItem = async (id) => {
+export const getItem = (id) => {
   let item = store.getters.collection.filter(obj => obj.id === id);
   if (item.length)
     return item[0];
-  return await axios.get(`https://www.googleapis.com/books/v1/volumes/${id}`)
+  
+  let data = {};
+  return axios.get(`https://www.googleapis.com/books/v1/volumes/${id}`)
     .then(response => {
       if (response.status === 200) {
         // console.log(response.data);
-        return response.data;
+        data = response.data;
       }
-      return {};
+      return data;
     })
     .catch(err => {
       console.log(err);
-      return {};
+      return data;
     });
 };
 
-export const getCountries = async () => {
+export const getCountries = () => {
   let country = [];
-  await axios.get('https://countriesnow.space/api/v0.1/countries/capital')
+  return axios.get('https://countriesnow.space/api/v0.1/countries/capital')
     .then(response => {
       if (response.status == 200) {
         country = response.data.data.map(obj => obj.name);
       }
+      return country;
     })
-    .catch(console.log);
-  return country;
+    .catch(err => {
+      console.log(err);
+      return country;
+    });
 };
 
-export const getStates = async (country) => {
+export const getStates = (country) => {
   let states = [];
-  await axios.post('https://countriesnow.space/api/v0.1/countries/states', { country })
+  return axios.post('https://countriesnow.space/api/v0.1/countries/states', { country })
     .then(response => {
       if (response.status == 200) {
         states = response.data.data.states.map(obj => obj.name);
       }
+      return states;
     })
-    .catch(console.log);
-  return states;
+    .catch(err => {
+      console.log(err);
+      return states;
+    });
 };
 
-export const getCities = async (country, state) => {
+export const getCities = (country, state) => {
   let cities = [];
-  await axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { country, state })
+  return axios.post('https://countriesnow.space/api/v0.1/countries/state/cities', { country, state })
     .then(response => {
       if (response.status == 200) {
         cities = response.data.data;
       }
+      return cities;
     })
-    .catch(console.log);
-  return cities;
+    .catch(err => {
+      console.log(err);
+      return cities;
+    });
 };
 
-export const getFlag = async (country) => {
+export const getFlag = (country) => {
   let flag = '';
-  await axios.post('https://countriesnow.space/api/v0.1/countries/flag/unicode', { country })
+  return axios.post('https://countriesnow.space/api/v0.1/countries/flag/unicode', { country })
     .then(response => {
       if (response.status == 200) {
         flag = response.data.data.unicodeFlag;
       }
+      return flag;
     })
-    .catch(console.log);
-  return flag;
+    .catch(err => {
+      console.log(err);
+      return flag;
+    });
 };
 
 export const formattedDate = (date) => {
