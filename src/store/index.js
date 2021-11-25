@@ -42,6 +42,9 @@ export default new Vuex.Store({
         state.token = data.token;
         localStorage.setItem('token', data.token);
       }
+      // Object.keys(data.user).forEach((key) => {
+      //   state.user[key] = data.user[key];
+      // });
       state.user = Object.assign({}, state.user, data.user);
     },
   },
@@ -87,6 +90,7 @@ export default new Vuex.Store({
       commit('setError', null);
       api(path, data)
         .then((response) => {
+          console.log(response);
           if (response.success) {
             commit('setUserData', response);
             router.push({ name: 'Home' });
