@@ -139,6 +139,8 @@ export default {
         price: this.price,
         quantity: this.quantity,
       });
+      this.sellerInfo.price = this.price;
+      this.sellerInfo.quantity = this.quantity;
       this.updateUserData({
         user: {
           seller: {

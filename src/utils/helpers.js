@@ -1,6 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import store from '../store';
+import { api } from './services';
 
 export const getItem = (id) => {
   let item = store.getters.collection.filter(obj => obj.id === id);
@@ -19,6 +20,21 @@ export const getItem = (id) => {
     .catch(err => {
       console.log(err);
       return data;
+    });
+};
+
+export const getSellers = (id) => {
+  let sellers = [];
+  return api('/auth/getSellers', { id })
+    .then(response => {
+      if (response.success) {
+        sellers = response.data;
+      }
+      return sellers;
+    })
+    .catch(err => {
+      console.log(err);
+      return sellers;
     });
 };
 

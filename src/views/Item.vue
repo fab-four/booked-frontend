@@ -204,6 +204,59 @@
               Information not available.
             </v-card-text>
           </div>
+          <div v-if="isAuthenticated && !user.isSeller">
+            <v-card-title class="font-weight-bold text-h4">
+              Sellers
+            </v-card-title>
+            <v-card-text
+              v-if="sellers && sellers.length"
+              class="text-h6"
+            >
+              <v-card
+                v-for="(seller, i) in sellers"
+                :key="i"
+                flat
+                width="100%"
+                class="mb-10"
+              >
+                <v-row no-gutters>
+                  <v-col class="d-flex-column">
+                    <v-card-title class="pa-0 justify-center">
+                      {{ seller.name }}
+                    </v-card-title>
+                    <v-card-text class="pa-0 text-center">
+                      Price: &#x20B9; {{ seller.price }}<br>
+                      Available Pcs: {{ seller.quantity }}
+                    </v-card-text>
+                  </v-col>
+                  <v-col class="d-flex-column">
+                    <v-slider
+                      v-model="seller.buyerQuantity"
+                      :max="seller.quantity"
+                      :min="1"
+                      thumb-label
+                    />
+                    <v-card-actions class="justify-center">
+                      <v-btn
+                        large
+                        color="primary"
+                        @click="buy(seller.email, seller.buyerQuantity)"
+                      >
+                        Buy
+                      </v-btn>
+                    </v-card-actions>
+                  </v-col>
+                </v-row>
+                <v-divider />
+              </v-card>
+            </v-card-text>
+            <v-card-text
+              v-else
+              class="text-h6"
+            >
+              No sellers available.
+            </v-card-text>
+          </div>
         </v-col>
       </v-row>
     </v-card>
@@ -211,8 +264,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { getItem } from '@/utils/helpers';
+import { mapActions, mapGetters } from 'vuex';
+import { getItem, getSellers } from '@/utils/helpers';
 import Ratings from '@/components/Ratings';
 import Loading from '@/components/Loading';
 import Overlay from '@/components/Overlay';
@@ -250,10 +303,31 @@ export default {
     async item() {
       return await getItem(this.id);
     },
+    async sellers() {
+      if (this.isAuthenticated && !this.user.isSeller)
+        return await getSellers(this.id);
+      return {};
+    },
   },
   methods: {
+    ...mapActions(['buyBook']),
     languageName(code) {
       return new Intl.DisplayNames(['en'], {type: 'language'}).of(code);
+    },
+    buy(sellerId, quantity) {
+      this.buyBook({
+        sellerId,
+        quantity,
+        bookId: this.item.id,
+      })
+        .then(() => {
+          for (const seller of this.sellers) {
+            if (seller.email === sellerId) {
+              seller.quantity -= quantity;
+              seller.buyerQuantity = 1;
+            }
+          }
+        });
     },
   },
 };

@@ -83,7 +83,6 @@ export default {
           ...this.user.buyer.read,
           ...this.user.buyer.bought.map(obj => obj.bookId),
         ];
-        books = [...new Set(books)];
         break;
       
       case 'Favorites':
@@ -102,6 +101,7 @@ export default {
         books = this.user.buyer.bought.map(obj => obj.bookId);
         break;
       }
+      books = [...new Set(books)];
       return books.map(obj => { return { id: obj }; });
     },
   },

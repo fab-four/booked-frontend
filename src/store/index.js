@@ -152,6 +152,29 @@ export default new Vuex.Store({
         .finally(() => commit('setLoading', false));
     },
 
+    buyBook({ commit }, sellingInfo) {
+      commit('setLoading', true);
+      commit('setError', null);
+      commit('setUserData', {
+        user: {
+          buyer: {
+            bought: {
+              ...sellingInfo,
+              date: new Date(),
+            },
+          },
+        },
+      });
+      api('/auth/buy', sellingInfo)
+        .then((response) => {
+          console.log(response.msg);
+        })
+        .catch(error => {
+          commit('setError', error);
+        })
+        .finally(() => commit('setLoading', false));
+    },
+
     clearError({ commit }) {
       commit('setError', null);
     },
