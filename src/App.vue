@@ -75,6 +75,7 @@
         </v-btn>
       </v-toolbar-items>
     </v-app-bar>
+    <NotificationContainer />
     <v-main>
       <router-view :key="$route.fullPath" />
     </v-main>
@@ -84,10 +85,11 @@
 <script>
 import NavigationMenu from '@/components/NavigationMenu';
 import { mapGetters, mapActions } from 'vuex';
-
+import NotificationContainer from '@/components/NotificationContainer.vue';
 export default {
   components: {
     NavigationMenu,
+    NotificationContainer,
   },
   data() {
     return {

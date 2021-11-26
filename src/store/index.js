@@ -6,6 +6,7 @@ import router from '@/router';
 import _ from 'lodash';
 
 Vue.use(Vuex);
+let notificationId = 1;
 
 export default new Vuex.Store({
   state: {
@@ -16,7 +17,8 @@ export default new Vuex.Store({
     error: null,
     loading: false,
     query: '',
-    index : -1,
+    index: -1,
+    notifications: [],
   },
 
   mutations: {
@@ -44,6 +46,17 @@ export default new Vuex.Store({
         localStorage.setItem('token', data.token);
       }
       state.user = _.merge(state.user, data.user);
+    },
+    pushNotification(state, notification) {
+      state.notifications.push({
+        ...notification,
+        id: notificationId++,
+      });
+    },
+    deleteNotification(state, notificationToRemove) {
+      state.notifications = state.notifications.filter(
+        notification => notification.id !== notificationToRemove.id,
+      );
     },
   },
 
@@ -180,6 +193,12 @@ export default new Vuex.Store({
     },
     setLoading({ commit }, payload) {
       commit('setLoading', payload);
+    },
+    addNotification({ commit }, notification) {
+      commit('pushNotification', notification);
+    },
+    removeNotification({ commit }, notificationToRemove) {
+      commit('deleteNotification', notificationToRemove);
     },
   },
 

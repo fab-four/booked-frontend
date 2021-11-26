@@ -1,4 +1,5 @@
 import axios from 'axios';
+import store from '@/store/index';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:3000',
@@ -21,8 +22,14 @@ export const api = (path, data) => {
   return apiClient
     .post(path, data)
     .then(({ data }) => {
+      store.dispatch('addNotification', data);
       return data;
     }).catch(() => {
-      return { success: false, msg: 'Cannot connect to server' };
+      const notification = {
+        success: false,
+        msg: 'Cannot Connect to server',
+      };
+      store.dispatch('addNotification', notification);
+      return notification;
     });
 };
