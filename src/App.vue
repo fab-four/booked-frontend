@@ -114,13 +114,24 @@ export default {
             icon: 'mdi-cart', 
             title: 'Catalogue', 
             name: 'Catalogue', 
-          });
+          },
+          {
+            icon: 'mdi-cart', 
+            title: 'Orders', 
+            name: 'SellingOrders', 
+          },
+          );
         }
         else {
           menuItems.push({ 
             icon: 'mdi-bookmark-multiple', 
             title: 'My Books', 
             name: 'Favorites', 
+          },
+          {
+            icon: 'mdi-cart', 
+            title: 'Orders', 
+            name: 'Orders', 
           });
         }
       }

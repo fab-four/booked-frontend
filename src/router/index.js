@@ -7,6 +7,8 @@ import SignUp from '../views/SignUp';
 import Profile from '../views/Profile';
 import Catalogue from '../views/Catalogue';
 import Favorites from '../views/Favorites';
+import Orders from '../views/Orders';
+import SellingOrders from '../views/SellingOrders';
 import store from '../store';
 
 Vue.use(VueRouter);
@@ -57,9 +59,27 @@ const routes = [
     },
   },
   {
+    path: '/selling-orders',
+    name: 'SellingOrders',
+    component: SellingOrders,
+    meta: {
+      requiresAuth: true,
+      requiresSeller: true,
+    },
+  },
+  {
     path: '/mybooks',
     name: 'Favorites',
     component: Favorites,
+    meta: {
+      requiresAuth: true,
+      requiresBuyer: true,
+    },
+  },
+  {
+    path: '/orders',
+    name: 'Orders',
+    component: Orders,
     meta: {
       requiresAuth: true,
       requiresBuyer: true,
