@@ -132,7 +132,13 @@ export default {
             icon: 'mdi-cart', 
             title: 'Orders', 
             name: 'Orders', 
-          });
+          },
+          {
+            icon: 'mdi-cart-plus', 
+            title: 'Cart', 
+            name: 'Cart', 
+          },
+          );
         }
       }
       return menuItems;

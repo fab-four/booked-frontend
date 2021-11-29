@@ -9,6 +9,7 @@ import Catalogue from '../views/Catalogue';
 import Favorites from '../views/Favorites';
 import Orders from '../views/Orders';
 import SellingOrders from '../views/SellingOrders';
+import Cart from '../views/Cart';
 import store from '../store';
 
 Vue.use(VueRouter);
@@ -80,6 +81,15 @@ const routes = [
     path: '/orders',
     name: 'Orders',
     component: Orders,
+    meta: {
+      requiresAuth: true,
+      requiresBuyer: true,
+    },
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart,
     meta: {
       requiresAuth: true,
       requiresBuyer: true,
