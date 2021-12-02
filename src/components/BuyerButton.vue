@@ -56,31 +56,6 @@
           <span>{{ markText }}</span>
         </v-tooltip>
       </v-btn>
-      <v-btn
-        fab
-        color="red"
-        class="white--text mx-5"
-        @click="updateCart"
-      >
-        <v-tooltip bottom>
-          <template #activator="{ on }">
-            <v-icon
-              v-if="!cart"
-              v-on="on"
-            >
-              mdi-cart-plus
-            </v-icon>
-        
-            <v-icon
-              v-else
-              v-on="on"
-            >
-              mdi-cart-minus
-            </v-icon>
-          </template>
-          <span>{{ cartText }}</span>
-        </v-tooltip>
-      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -106,12 +81,6 @@ export default {
       }
       return false;
     },
-    cart() {
-      if (this.item) {
-        return !!this.user.buyer.cart.filter(obj => obj === this.item.id).length;
-      }
-      return false;
-    },
     toRead() {
       if (this.item) {
         return !!this.user.buyer.toRead.filter(obj => obj === this.item.id).length;
@@ -128,11 +97,6 @@ export default {
       if (this.favorite)
         return 'Remove from Favorites';
       return 'Add to Favorites';
-    },
-    cartText() {
-      if (this.cart)
-        return 'Remove from cart';
-      return 'Add to cart';
     },
     markText() {
       if (!this.toRead && !this.read)
@@ -158,19 +122,6 @@ export default {
         user: {
           buyer: {
             favourites: this.user.buyer.favourites,
-          },
-        },
-      });
-    },
-    updateCart() {
-      if (this.cart)
-        this.user.buyer.cart = this.user.buyer.cart.filter(obj => obj !== this.item.id);
-      else
-        this.user.buyer.cart.push(this.item.id);
-      this.updateUserData({
-        user: {
-          buyer: {
-            cart: this.user.buyer.cart,
           },
         },
       });

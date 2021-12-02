@@ -272,6 +272,8 @@ import Overlay from '@/components/Overlay';
 import SellerButton from '@/components/SellerButton';
 import BuyerButton from '@/components/BuyerButton';
 
+let stripe = window.Stripe(process.env.VUE_APP_STRIPE_PUBLISHABLE_KEY);
+
 export default {
   name: 'Item',
   components: {
@@ -309,25 +311,47 @@ export default {
       return {};
     },
   },
+  async mounted() {
+    const secret = localStorage.getItem('secret');
+    if (secret) {
+      const {paymentIntent} = await stripe.retrievePaymentIntent(secret);
+      if (paymentIntent && paymentIntent.status === 'succeeded') {
+        this.addNotification({
+          success: true,
+          msg: 'Item successfully bought',
+        });
+      } else {
+        this.addNotification({
+          success: false,
+          msg: 'Failed to buy item',
+        });
+      }
+      localStorage.removeItem('secret');
+    }
+  },
   methods: {
-    ...mapActions(['buyBook']),
+    ...mapActions(['buyBook', 'addNotification']),
     languageName(code) {
       return new Intl.DisplayNames(['en'], {type: 'language'}).of(code);
     },
     buy(sellerId, quantity) {
       this.buyBook({
+        bookTitle: this.item.volumeInfo.title,
         sellerId,
         quantity,
         bookId: this.item.id,
-      })
-        .then(() => {
-          for (const seller of this.sellers) {
-            if (seller.email === sellerId) {
-              seller.quantity -= quantity;
-              seller.buyerQuantity = 1;
-            }
-          }
-        });
+      });
+      // .then(() => {
+      //   for (const seller of this.sellers) {
+      //     if (seller.email === sellerId) {
+      //       seller.quantity -= quantity;
+      //       if (seller.quantity === 0) {
+      //         this.sellers = this.sellers.filter(obj => obj.email !== seller.email);
+      //       }
+      //       seller.buyerQuantity = 1;
+      //     }
+      //   }
+      // });
     },
   },
 };

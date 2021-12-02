@@ -4,19 +4,6 @@
     fluid
   >
     <v-row
-      v-if="error"
-      justify="center"
-      dense
-    >
-      <v-col cols="6">
-        <app-alert
-          :text="error.message"
-          :type="'success'"
-          @close-alert="onDismissed"
-        />
-      </v-col>
-    </v-row>
-    <v-row
       justify="center"
       dense
     >
@@ -166,7 +153,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['user', 'loading', 'error']),
+    ...mapGetters(['user', 'loading']),
     // password() {
     //   return this.user.password;
     // },
@@ -196,22 +183,15 @@ export default {
       return cols;
     },
   },
-  async mounted() {
-    this.clearError();
-  },
   methods: {
-    ...mapActions(['updateUserData', 'clearError']),
+    ...mapActions(['updateUserData']),
     formattedDate,
     onSave() {
       this.updateUserData({
         user: {
           personalDetails: this.user.personalDetails,
         }, 
-        message: 'Data updated successfully!',
       });
-    },
-    onDismissed() {
-      this.clearError();
     },
   },
 };

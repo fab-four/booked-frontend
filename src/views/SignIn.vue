@@ -3,19 +3,6 @@
     fill-height
     fluid
   >
-    <v-row
-      v-if="error"
-      justify="center"
-    >
-      <v-col :cols="cols">
-        <app-alert
-          :text="error.message"
-          :type="'error'"
-          @close-alert="onDismissed"
-        />
-      </v-col>
-    </v-row>
-
     <v-row justify="center">
       <v-col :cols="cols">
         <v-card flat>
@@ -79,7 +66,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
 export default {
   name: 'SignIn',
   data() {
@@ -99,7 +86,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['error']),
     cols() {
       let cols = 10;
       switch (this.$vuetify.breakpoint.name) {
@@ -116,11 +102,8 @@ export default {
       return cols;
     },
   },
-  created() {
-    this.clearError();
-  },
   methods: {
-    ...mapActions(['clearError', 'authenticate']),
+    ...mapActions(['authenticate']),
     onSubmit() {
       this.authenticate({
         path: '/auth/signIn', 
@@ -129,10 +112,6 @@ export default {
           password: this.password,
         },
       });
-    },
-    onDismissed() {
-      // console.log('Dismissed alert');
-      this.clearError();
     },
   },
 };

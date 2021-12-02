@@ -14,10 +14,9 @@ export default new Vuex.Store({
     totalItems: 0,
     token: null,
     user: null,
-    error: null,
     loading: false,
     query: '',
-    index: -1,
+    pageIndex: 1,
     notifications: [],
   },
 
@@ -28,17 +27,14 @@ export default new Vuex.Store({
     setTotalItems(state, payload) {
       state.totalItems = payload;
     },
-    setError(state, payload) {
-      state.error = payload;
-    },
     setLoading(state, payload) {
       state.loading = payload;
     },
     setQuery(state, payload) {
       state.query = payload;
     },
-    setIndex(state, payload) {
-      state.index = payload;
+    setPageIndex(state, payload) {
+      state.pageIndex = payload;
     },
     setUserData(state, data) {
       if (data.token) {
@@ -61,21 +57,20 @@ export default new Vuex.Store({
   },
 
   actions: {
-    fetchCollection({ state, commit }, { query, index }) {
-      // let { query, index } = payload;
-      // console.log(query, index);
-      if ((query === state.query) && (index === state.index))
+    fetchCollection({ state, commit }, { query, pageIndex }) {
+      // let { query, pageIndex } = payload;
+      // console.log(query, pageIndex);
+      if (query && (query === state.query) && (pageIndex === state.pageIndex))
         return;
       commit('setQuery', query);
-      commit('setIndex', index);
+      commit('setPageIndex', pageIndex);
       commit('setLoading', true);
-      commit('setError', null);
       if (query === '')
         query = 'harry potter';
       let url = 'https://www.googleapis.com/books/v1/volumes';
       let params = {
         q: query,
-        startIndex: index,
+        startIndex: (pageIndex - 1) * 12,
         maxResults: 12,
         langRestrict: 'en',
       };
@@ -88,17 +83,15 @@ export default new Vuex.Store({
           else {
             console.log('Request failed');
           }
-          commit('setLoading', false);
         })
         .catch(error => {
-          commit('setError', error);
-          commit('setLoading', false);
-        });
+          console.log(error);
+        })
+        .finally(() => commit('setLoading', false));
     },
     
-    authenticate({ commit }, { path, data }) {
+    authenticate({ commit, dispatch }, { path, data }) {
       commit('setLoading', true);
-      commit('setError', null);
       api(path, data)
         .then((response) => {
           // console.log(response);
@@ -106,10 +99,10 @@ export default new Vuex.Store({
             commit('setUserData', response);
             router.push({ name: 'Home' });
           }
+          dispatch('addNotification', _.pick(response, ['success', 'msg']));
         })
-        .catch(error => {
+        .catch(() => {
           commit('setUserData', { token: null, user: null });
-          commit('setError', error);
         })
         .finally(() => commit('setLoading', false));
     },
@@ -145,29 +138,19 @@ export default new Vuex.Store({
       location.reload();
     },
 
-    updateUserData({ state, commit }, { user, loading = true, message = '' }) {
-      commit('setLoading', loading);
-      commit('setError', null);
+    updateUserData({ state, commit, dispatch }, { user }) {
+      commit('setLoading', true);
       commit('setUserData', { user });
       
       api('/auth/updateDetails', state.user)
         .then((response) => {
-          if (response.success) {
-            console.log(message);
-          }
-          else {
-            console.log('update failed');
-          }
-        })
-        .catch(error => {
-          commit('setError', error);
+          dispatch('addNotification', _.pick(response, ['success', 'msg']));
         })
         .finally(() => commit('setLoading', false));
     },
 
     buyBook({ commit }, sellingInfo) {
       commit('setLoading', true);
-      commit('setError', null);
       commit('setUserData', {
         user: {
           buyer: {
@@ -180,17 +163,15 @@ export default new Vuex.Store({
       });
       api('/auth/buy', sellingInfo)
         .then((response) => {
-          console.log(response.msg);
-        })
-        .catch(error => {
-          commit('setError', error);
+          if (response.success) {
+            localStorage.setItem('secret', response.secret);
+            window.location = response.url;
+          }
+          // dispatch('addNotification', _.pick(response, ['success', 'msg']));
         })
         .finally(() => commit('setLoading', false));
     },
 
-    clearError({ commit }) {
-      commit('setError', null);
-    },
     setLoading({ commit }, payload) {
       commit('setLoading', payload);
     },
@@ -205,7 +186,6 @@ export default new Vuex.Store({
   getters: {
     collection: state => state.collection,
     user: state => state.user,
-    error: state => state.error,
     loading: state => state.loading,
     getImage: () => item => {
       let defaultImage = 'http://books.google.com/books/publisher/content?id=2wgyBgAAQBAJ&printsec=frontcover&img=1';
@@ -222,6 +202,8 @@ export default new Vuex.Store({
     },
     totalItems: state => state.totalItems,
     isAuthenticated: (state) => !!state.token,
+    query: state => state.query,
+    pageIndex: state => state.pageIndex,
   },
   modules: {},
 });

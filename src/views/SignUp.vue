@@ -3,19 +3,6 @@
     fill-height
     fluid
   >
-    <v-row
-      v-if="error"
-      justify="center"
-    >
-      <v-col :cols="cols">
-        <app-alert
-          :text="error.message"
-          :type="'error'"
-          @close-alert="onDismissed"
-        />
-      </v-col>
-    </v-row>
-
     <v-row justify="center">
       <v-col :cols="cols">
         <v-card flat>
@@ -165,7 +152,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['error', 'loading']),
+    ...mapGetters(['loading']),
     comparePasswords() {
       return this.password !== this.confirmPassword
         ? 'Passwords do not match'
@@ -187,11 +174,8 @@ export default {
       return cols;
     },
   },
-  created() {
-    this.clearError();
-  },
   methods: {
-    ...mapActions(['clearError', 'authenticate']),
+    ...mapActions(['authenticate']),
     onSubmit() {
       // console.log('submitted');
       this.authenticate({
@@ -207,10 +191,6 @@ export default {
           isSeller: this.isSeller,
         },
       });
-    },
-    onDismissed() {
-      // console.log('Dismissed alert');
-      this.clearError();
     },
   },
 };

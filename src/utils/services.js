@@ -22,12 +22,11 @@ export const api = (path, data) => {
   return apiClient
     .post(path, data)
     .then(({ data }) => {
-      store.dispatch('addNotification', data);
       return data;
     }).catch(() => {
       const notification = {
         success: false,
-        msg: 'Cannot Connect to server',
+        msg: 'Cannot connect to server',
       };
       store.dispatch('addNotification', notification);
       return notification;

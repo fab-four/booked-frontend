@@ -1,13 +1,6 @@
 <template>
-  <v-card
-    flat
-    tile
-    class="indigo darken-3"
-  >
-    <v-card-text
-      v-if="catalogue.length"
-      class="white"
-    >
+  <v-card flat>
+    <v-card-text v-if="catalogue.length">
       <CollectionCard
         :collection="catalogue"
         card-width="200"
@@ -16,7 +9,7 @@
     </v-card-text>
     <v-card-text
       v-else
-      class="text-center white title"
+      class="text-center title"
     >
       No items available.
     </v-card-text>

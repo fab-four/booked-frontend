@@ -110,36 +110,18 @@ export default {
           { icon: 'mdi-account', title: 'Profile', name: 'Profile' },
         ];
         if (this.user.isSeller) {
-          menuItems.push({ 
-            icon: 'mdi-cart', 
-            title: 'Catalogue', 
-            name: 'Catalogue', 
-          },
-          {
-            icon: 'mdi-cart', 
-            title: 'Orders', 
-            name: 'SellingOrders', 
-          },
+          menuItems.push(
+            { icon: 'mdi-cart', title: 'Catalogue', name: 'Catalogue' },
           );
         }
         else {
-          menuItems.push({ 
-            icon: 'mdi-bookmark-multiple', 
-            title: 'My Books', 
-            name: 'Favorites', 
-          },
-          {
-            icon: 'mdi-cart', 
-            title: 'Orders', 
-            name: 'Orders', 
-          },
-          {
-            icon: 'mdi-cart-plus', 
-            title: 'Cart', 
-            name: 'Cart', 
-          },
+          menuItems.push(
+            { icon: 'mdi-bookmark-multiple', title: 'My Books', name: 'Favorites' },
           );
         }
+        menuItems.push(
+          { icon: 'mdi-cart', title: 'Orders', name: 'Orders' },
+        );
       }
       return menuItems;
     },

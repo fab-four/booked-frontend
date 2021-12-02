@@ -1,10 +1,6 @@
 <template>
-  <v-card
-    flat
-    tile
-    class="indigo darken-3"
-  >
-    <v-card-text class="white">
+  <v-card flat>
+    <v-card-text>
       <v-row
         no-gutters
         justify="end"
@@ -31,7 +27,7 @@
     </v-card-text>
     <v-card-text
       v-else
-      class="text-center white title"
+      class="text-center title"
     >
       No items available.
     </v-card-text>

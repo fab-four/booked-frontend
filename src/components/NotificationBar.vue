@@ -2,11 +2,10 @@
   <div
     v-if="notification.msg.length"
     class="notification-bar"
-    :class="notificationTypeClass"
   >
     <v-alert
       :type="notification.success ? 'success' : 'error'"
-      dismissible
+      dense
     >
       {{ notification.msg }}
     </v-alert>
@@ -25,11 +24,6 @@ export default {
   data: () => ({
     timeout: null,
   }),
-  computed: {
-    notificationTypeClass() {
-      return `${this.notification.success ? 'green' : 'red'}`;
-    },
-  },
   beforeDestroy() {
     clearTimeout(this.timeout);
   },
@@ -44,7 +38,6 @@ export default {
 
 <style scoped>
 .notification-bar {
-  margin: 1em 0 1em;
-  border-radius: 15px;
+  margin: 1em 1em;
 }
 </style>

@@ -29,7 +29,7 @@
           v-if="!loading || collectionIds.length"
           v-model="page"
           :length="Math.min(Math.ceil(totalItems / 12), 10)"
-          @input="updateCollection('index')"
+          @input="updateCollection('pageIndex')"
         />
       </div>
     </v-card-text>
@@ -59,15 +59,17 @@ export default {
     page: 1,
   }),
   computed: {
-    ...mapGetters(['collection', 'loading', 'totalItems']),
+    ...mapGetters(['collection', 'loading', 'totalItems', 'query', 'pageIndex']),
     collectionIds() {
       return this.collection.map(obj => { return { id: obj.id }; });
     },
   },
   created() {
+    this.search = this.query;
+    this.page = this.pageIndex;
     this.fetchCollection({
       query: this.search, 
-      index: (this.page - 1) * 12,
+      pageIndex: this.page,
     });
   },
   methods: {
@@ -77,7 +79,7 @@ export default {
         this.page = 1;
       this.fetchCollection({
         query: this.search, 
-        index: (this.page - 1) * 12,
+        pageIndex: this.page,
       });
     },
   },
